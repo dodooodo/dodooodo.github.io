@@ -1,188 +1,160 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>深夜咖啡共享平台 | 無人化夜間營運解決方案</title>
-  <meta name="description" content="自動化夜間共享座位平台，協助咖啡廳深夜時段無人營運也能穩定創收。">
-  <meta name="keywords" content="深夜咖啡廳, 空間共享, 自動化座位租借, 無人店, 咖啡廳副業">
-  <meta property="og:title" content="深夜咖啡共享平台">
-  <meta property="og:description" content="無人化夜間營運解決方案，咖啡廳自動賺錢的最佳選擇。">
-  <meta property="og:image" content="https://yourdomain.com/og-image.jpg">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://yourusername.github.io">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>深夜共享咖啡廳平台</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; }
-    body {
+    :root {
+      --primary: #1E1E2F;
+      --accent: #FFD369;
+      --light: #FAFAFA;
+      --gray: #999;
+    }
+    * {
       margin: 0;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-      background: #fff;
-      color: #111;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+    body {
+      background-color: var(--primary);
+      color: var(--light);
       line-height: 1.6;
-      scroll-behavior: smooth;
-    }
-    .fade-in {
-      opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-    }
-    .fade-in.show {
-      opacity: 1;
-      transform: none;
-    }
-    #loader {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: #111;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      z-index: 9999;
     }
     header {
-      background: #111;
-      color: #fff;
-      padding: 2rem 1rem;
+      padding: 4rem 2rem;
       text-align: center;
+      background: linear-gradient(to bottom, #1E1E2F, #111);
     }
     header h1 {
       font-size: 2.5rem;
-      margin-bottom: 0.5rem;
+      margin-bottom: 1rem;
     }
     header p {
-      font-size: 1.1rem;
-      color: #ccc;
+      font-size: 1.2rem;
+      color: var(--gray);
     }
-    .container {
+    .cta-buttons {
+      margin-top: 2rem;
+    }
+    .cta-buttons a {
+      padding: 0.8rem 1.5rem;
+      margin: 0 0.5rem;
+      border-radius: 8px;
+      background-color: var(--accent);
+      color: #000;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    .cta-buttons a:hover {
+      background-color: #f8c948;
+    }
+    section {
+      padding: 4rem 2rem;
       max-width: 960px;
       margin: 0 auto;
-      padding: 2rem 1rem;
     }
-    .section {
-      margin-bottom: 3rem;
-    }
-    .section h2 {
-      font-size: 1.75rem;
+    section h2 {
+      font-size: 2rem;
       margin-bottom: 1rem;
-      border-left: 4px solid #111;
-      padding-left: 0.5rem;
+      text-align: center;
     }
-    .gallery {
+    .steps, .benefits, .testimonials {
       display: grid;
-      gap: 1rem;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      margin-bottom: 2rem;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
     }
-    .gallery img {
-      width: 100%;
-      border-radius: 8px;
+    .card {
+      background-color: #2A2A3B;
+      padding: 1.5rem;
+      border-radius: 1rem;
     }
-    ul {
-      padding-left: 1rem;
-    }
-    ul li {
+    .card h3 {
       margin-bottom: 0.5rem;
-    }
-    form input, form textarea {
-      width: 100%;
-      padding: 0.75rem;
-      margin-bottom: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 1rem;
-    }
-    form button {
-      background: #111;
-      color: #fff;
-      border: none;
-      padding: 0.75rem 1.5rem;
-      border-radius: 6px;
-      font-size: 1rem;
-      cursor: pointer;
     }
     footer {
       text-align: center;
-      font-size: 0.875rem;
-      color: #666;
-      padding: 2rem 1rem;
-      background: #f9f9f9;
+      padding: 2rem;
+      font-size: 0.9rem;
+      color: var(--gray);
+      background-color: #111;
     }
   </style>
-  <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      const loader = document.getElementById('loader');
-      setTimeout(() => loader.style.display = 'none', 800);
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('show');
-            observer.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.1 });
-
-      document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-    });
-  </script>
 </head>
 <body>
-  <div id="loader">載入中...</div>
-
-  <header class="fade-in">
-    <h1>深夜咖啡共享平台</h1>
-    <p>讓您的咖啡廳在深夜無人營運時段也能穩定獲利</p>
+  <header>
+    <h1>讓深夜也能營收</h1>
+    <p>將您的咖啡廳座位變成自動獲利的共享空間</p>
+    <div class="cta-buttons">
+      <a href="#contact">立即加入合作</a>
+      <a href="#demo">觀看示範影片</a>
+    </div>
   </header>
 
-  <main class="container">
-    <section class="section fade-in">
-      <h2>我們的特色</h2>
-      <ul>
-        <li>自動化預約與進出系統，0 人力負擔</li>
-        <li>實名登入、監控錄影，安全無死角</li>
-        <li>平台分潤透明，彈性選擇抽成或訂閱</li>
-      </ul>
-    </section>
-
-    <section class="section fade-in">
-      <h2>環境與操作示意</h2>
-      <div class="gallery">
-        <img src="https://via.placeholder.com/400x250?text=夜間咖啡廳空間" alt="夜間咖啡廳空間">
-        <img src="https://via.placeholder.com/400x250?text=App+預約畫面" alt="App 預約畫面">
-        <img src="https://via.placeholder.com/400x250?text=後台收益報表" alt="後台收益報表">
+  <section id="how-it-works">
+    <h2>輕鬆三步，立即上架您的空間</h2>
+    <div class="steps">
+      <div class="card">
+        <h3>1. 上傳資訊</h3>
+        <p>填寫空間資訊與照片，我們幫您上架。</p>
       </div>
-    </section>
+      <div class="card">
+        <h3>2. 安裝設備</h3>
+        <p>協助安裝監控與開門裝置，保障安全。</p>
+      </div>
+      <div class="card">
+        <h3>3. 自動營運</h3>
+        <p>用戶掃碼預約進場，全程無人化營運。</p>
+      </div>
+    </div>
+  </section>
 
-    <section class="section fade-in">
-      <h2>合作流程</h2>
-      <ul>
-        <li>步驟 1：留下資料 ➝ 免費收益模擬</li>
-        <li>步驟 2：設備安裝 + 系統導入</li>
-        <li>步驟 3：開啟夜間共享營運</li>
-      </ul>
-    </section>
+  <section id="benefits">
+    <h2>平台優勢</h2>
+    <div class="benefits">
+      <div class="card">
+        <h3>化閒置為收入</h3>
+        <p>深夜無營運？讓座位自動為您創造營收。</p>
+      </div>
+      <div class="card">
+        <h3>全自動管理</h3>
+        <p>不需額外人力，平台自動處理預約與進出。</p>
+      </div>
+      <div class="card">
+        <h3>保障安全</h3>
+        <p>監視器、合約、保險三重保障降低風險。</p>
+      </div>
+    </div>
+  </section>
 
-    <section class="section fade-in" id="form">
-      <h2>立即合作</h2>
-      <p>想了解更多細節或試算潛在收益？歡迎填寫以下表單：</p>
-      <form name="contact" method="POST" data-netlify="true">
-        <input type="text" name="店家名稱" placeholder="店家名稱" required />
-        <input type="text" name="聯絡人" placeholder="聯絡人姓名" required />
-        <input type="tel" name="電話" placeholder="聯絡電話" required />
-        <input type="email" name="Email" placeholder="電子信箱" required />
-        <textarea name="備註" placeholder="其他補充資訊（選填）"></textarea>
-        <button type="submit">送出合作申請</button>
-      </form>
-    </section>
-  </main>
+  <section id="testimonials">
+    <h2>合作店家怎麼說？</h2>
+    <div class="testimonials">
+      <div class="card">
+        <h3>小日光咖啡</h3>
+        <p>「晚上不營業的時段現在每月可以多賺 $20,000，完全自動化，超省事。」</p>
+      </div>
+      <div class="card">
+        <h3>森之夜 Cafe</h3>
+        <p>「原本浪費的空間變成穩定收益，推薦給所有開店的朋友。」</p>
+      </div>
+    </div>
+  </section>
 
-  <footer class="fade-in">
-    &copy; 2025 深夜共享平台 | LINE 官方帳號：@latenightcafe
+  <section id="contact">
+    <h2>立即加入首批合作</h2>
+    <p style="text-align:center;margin:1rem auto;max-width:600px;">我們將為前 30 間店家提供免費導流與建置折扣，讓您零風險體驗平台收益。</p>
+    <div class="cta-buttons" style="text-align:center;">
+      <a href="mailto:hello@nightcafe.tw">預約顧問</a>
+      <a href="#">下載合作說明書</a>
+    </div>
+  </section>
+
+  <footer>
+    © 2025 深夜共享咖啡平台 NightCafe. All rights reserved.
   </footer>
 </body>
 </html>
