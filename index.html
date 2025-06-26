@@ -4,6 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>深夜咖啡共享平台 | 無人化夜間營運解決方案</title>
+  <meta name="description" content="自動化夜間共享座位平台，協助咖啡廳深夜時段無人營運也能穩定創收。">
+  <meta name="keywords" content="深夜咖啡廳, 空間共享, 自動化座位租借, 無人店, 咖啡廳副業">
+  <meta property="og:title" content="深夜咖啡共享平台">
+  <meta property="og:description" content="無人化夜間營運解決方案，咖啡廳自動賺錢的最佳選擇。">
+  <meta property="og:image" content="https://yourdomain.com/og-image.jpg">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://yourusername.github.io">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -15,6 +22,28 @@
       background: #fff;
       color: #111;
       line-height: 1.6;
+      scroll-behavior: smooth;
+    }
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    }
+    .fade-in.show {
+      opacity: 1;
+      transform: none;
+    }
+    #loader {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: #111;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      z-index: 9999;
     }
     header {
       background: #111;
@@ -43,6 +72,16 @@
       margin-bottom: 1rem;
       border-left: 4px solid #111;
       padding-left: 0.5rem;
+    }
+    .gallery {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      margin-bottom: 2rem;
+    }
+    .gallery img {
+      width: 100%;
+      border-radius: 8px;
     }
     ul {
       padding-left: 1rem;
@@ -75,15 +114,33 @@
       background: #f9f9f9;
     }
   </style>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const loader = document.getElementById('loader');
+      setTimeout(() => loader.style.display = 'none', 800);
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('show');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+
+      document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    });
+  </script>
 </head>
 <body>
-  <header>
+  <div id="loader">載入中...</div>
+
+  <header class="fade-in">
     <h1>深夜咖啡共享平台</h1>
     <p>讓您的咖啡廳在深夜無人營運時段也能穩定獲利</p>
   </header>
 
   <main class="container">
-    <section class="section">
+    <section class="section fade-in">
       <h2>我們的特色</h2>
       <ul>
         <li>自動化預約與進出系統，0 人力負擔</li>
@@ -92,7 +149,16 @@
       </ul>
     </section>
 
-    <section class="section">
+    <section class="section fade-in">
+      <h2>環境與操作示意</h2>
+      <div class="gallery">
+        <img src="https://via.placeholder.com/400x250?text=夜間咖啡廳空間" alt="夜間咖啡廳空間">
+        <img src="https://via.placeholder.com/400x250?text=App+預約畫面" alt="App 預約畫面">
+        <img src="https://via.placeholder.com/400x250?text=後台收益報表" alt="後台收益報表">
+      </div>
+    </section>
+
+    <section class="section fade-in">
       <h2>合作流程</h2>
       <ul>
         <li>步驟 1：留下資料 ➝ 免費收益模擬</li>
@@ -101,7 +167,7 @@
       </ul>
     </section>
 
-    <section class="section" id="form">
+    <section class="section fade-in" id="form">
       <h2>立即合作</h2>
       <p>想了解更多細節或試算潛在收益？歡迎填寫以下表單：</p>
       <form name="contact" method="POST" data-netlify="true">
@@ -115,7 +181,7 @@
     </section>
   </main>
 
-  <footer>
+  <footer class="fade-in">
     &copy; 2025 深夜共享平台 | LINE 官方帳號：@latenightcafe
   </footer>
 </body>
