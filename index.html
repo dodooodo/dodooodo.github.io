@@ -3,83 +3,120 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>深夜咖啡廳共享座位平台</title>
+  <title>深夜咖啡共享平台 | 無人化夜間營運解決方案</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
+    * { box-sizing: border-box; }
     body {
-      font-family: 'Helvetica Neue', sans-serif;
       margin: 0;
-      padding: 0;
-      background: #111;
-      color: #f4f4f4;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: #fff;
+      color: #111;
       line-height: 1.6;
     }
-    .hero {
-      background: linear-gradient(to right, #333, #111);
-      padding: 5rem 2rem;
+    header {
+      background: #111;
+      color: #fff;
+      padding: 2rem 1rem;
       text-align: center;
     }
-    .hero h1 {
-      font-size: 3rem;
-      margin-bottom: 1rem;
+    header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
     }
-    .hero p {
-      font-size: 1.25rem;
-      margin-bottom: 2rem;
-    }
-    .cta-button {
-      background: #ffcc00;
-      color: #111;
-      border: none;
-      padding: 1rem 2rem;
+    header p {
       font-size: 1.1rem;
-      border-radius: 8px;
-      cursor: pointer;
-      text-decoration: none;
+      color: #ccc;
+    }
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
     }
     .section {
-      padding: 3rem 2rem;
-      max-width: 800px;
-      margin: 0 auto;
+      margin-bottom: 3rem;
+    }
+    .section h2 {
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+      border-left: 4px solid #111;
+      padding-left: 0.5rem;
+    }
+    ul {
+      padding-left: 1rem;
+    }
+    ul li {
+      margin-bottom: 0.5rem;
+    }
+    form input, form textarea {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+    form button {
+      background: #111;
+      color: #fff;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
     }
     footer {
       text-align: center;
-      padding: 2rem;
-      background: #222;
-      font-size: 0.9rem;
+      font-size: 0.875rem;
+      color: #666;
+      padding: 2rem 1rem;
+      background: #f9f9f9;
     }
   </style>
 </head>
 <body>
-  <section class="hero">
-    <h1>讓咖啡廳在深夜自動賺錢</h1>
-    <p>共享座位平台，讓你深夜時段無人營運也能穩定收益。</p>
-    <a href="#form" class="cta-button">立即申請合作</a>
-  </section>
+  <header>
+    <h1>深夜咖啡共享平台</h1>
+    <p>讓您的咖啡廳在深夜無人營運時段也能穩定獲利</p>
+  </header>
 
-  <section class="section">
-    <h2>平台特色</h2>
-    <ul>
-      <li>自動化預約與門禁，無需額外人力</li>
-      <li>實名登入 + 監控保障，安全有保障</li>
-      <li>收益透明報表，按需分潤或訂閱制</li>
-    </ul>
-  </section>
+  <main class="container">
+    <section class="section">
+      <h2>我們的特色</h2>
+      <ul>
+        <li>自動化預約與進出系統，0 人力負擔</li>
+        <li>實名登入、監控錄影，安全無死角</li>
+        <li>平台分潤透明，彈性選擇抽成或訂閱</li>
+      </ul>
+    </section>
 
-  <section class="section" id="form">
-    <h2>申請合作</h2>
-    <p>想了解更多或預約導入？請留下聯絡方式：</p>
-    <form name="contact" method="POST" data-netlify="true">
-      <p><input type="text" name="店家名稱" placeholder="店家名稱" required /></p>
-      <p><input type="text" name="聯絡人" placeholder="聯絡人姓名" required /></p>
-      <p><input type="tel" name="電話" placeholder="聯絡電話" required /></p>
-      <p><input type="email" name="Email" placeholder="Email" required /></p>
-      <p><textarea name="備註" placeholder="其他補充資訊"></textarea></p>
-      <p><button type="submit" class="cta-button">送出表單</button></p>
-    </form>
-  </section>
+    <section class="section">
+      <h2>合作流程</h2>
+      <ul>
+        <li>步驟 1：留下資料 ➝ 免費收益模擬</li>
+        <li>步驟 2：設備安裝 + 系統導入</li>
+        <li>步驟 3：開啟夜間共享營運</li>
+      </ul>
+    </section>
+
+    <section class="section" id="form">
+      <h2>立即合作</h2>
+      <p>想了解更多細節或試算潛在收益？歡迎填寫以下表單：</p>
+      <form name="contact" method="POST" data-netlify="true">
+        <input type="text" name="店家名稱" placeholder="店家名稱" required />
+        <input type="text" name="聯絡人" placeholder="聯絡人姓名" required />
+        <input type="tel" name="電話" placeholder="聯絡電話" required />
+        <input type="email" name="Email" placeholder="電子信箱" required />
+        <textarea name="備註" placeholder="其他補充資訊（選填）"></textarea>
+        <button type="submit">送出合作申請</button>
+      </form>
+    </section>
+  </main>
 
   <footer>
-    &copy; 2025 深夜共享座位平台 | Line 官方帳號：@latenightcafe
+    &copy; 2025 深夜共享平台 | LINE 官方帳號：@latenightcafe
   </footer>
 </body>
 </html>
