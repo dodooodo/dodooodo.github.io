@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>深夜咖啡廳共享座位平台</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #111;
+      color: #f4f4f4;
+      line-height: 1.6;
+    }
+    .hero {
+      background: linear-gradient(to right, #333, #111);
+      padding: 5rem 2rem;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    .hero p {
+      font-size: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .cta-button {
+      background: #ffcc00;
+      color: #111;
+      border: none;
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .section {
+      padding: 3rem 2rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      background: #222;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <section class="hero">
+    <h1>讓咖啡廳在深夜自動賺錢</h1>
+    <p>共享座位平台，讓你深夜時段無人營運也能穩定收益。</p>
+    <a href="#form" class="cta-button">立即申請合作</a>
+  </section>
+
+  <section class="section">
+    <h2>平台特色</h2>
+    <ul>
+      <li>自動化預約與門禁，無需額外人力</li>
+      <li>實名登入 + 監控保障，安全有保障</li>
+      <li>收益透明報表，按需分潤或訂閱制</li>
+    </ul>
+  </section>
+
+  <section class="section" id="form">
+    <h2>申請合作</h2>
+    <p>想了解更多或預約導入？請留下聯絡方式：</p>
+    <form name="contact" method="POST" data-netlify="true">
+      <p><input type="text" name="店家名稱" placeholder="店家名稱" required /></p>
+      <p><input type="text" name="聯絡人" placeholder="聯絡人姓名" required /></p>
+      <p><input type="tel" name="電話" placeholder="聯絡電話" required /></p>
+      <p><input type="email" name="Email" placeholder="Email" required /></p>
+      <p><textarea name="備註" placeholder="其他補充資訊"></textarea></p>
+      <p><button type="submit" class="cta-button">送出表單</button></p>
+    </form>
+  </section>
+
+  <footer>
+    &copy; 2025 深夜共享座位平台 | Line 官方帳號：@latenightcafe
+  </footer>
+</body>
+</html>
