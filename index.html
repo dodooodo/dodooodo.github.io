@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Night Owl Cafe - Your After-Hours Workspace</title>
+    <title>Féplace - Your After-Hours Workspace</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -23,6 +23,10 @@
             opacity: 1;
             transform: translateY(0);
         }
+        /* 模態框淡入淡出效果 */
+        .modal {
+            transition: opacity 0.3s ease;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white">
@@ -30,7 +34,7 @@
     <!-- Header -->
     <header class="absolute top-0 left-0 w-full z-20 p-4">
         <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold" data-key="title">Night Owl Cafe</h1>
+            <h1 class="text-2xl font-bold" data-key="title">Féplace</h1>
             <nav class="hidden md:flex space-x-6 items-center">
                 <a href="#features" class="hover:text-amber-400 transition" data-key="nav_features">Features</a>
                 <a href="#how-it-works" class="hover:text-amber-400 transition" data-key="nav_how">How It Works</a>
@@ -40,7 +44,7 @@
                     <span>/</span>
                     <button onclick="setLanguage('zh-tw')" class="font-semibold hover:text-amber-400 transition">繁中</button>
                 </div>
-                <a href="#" class="bg-amber-500 hover:bg-amber-600 text-gray-900 font-bold py-2 px-4 rounded-lg transition" data-key="nav_signup">Sign Up</a>
+                <button class="signup-btn bg-amber-500 hover:bg-amber-600 text-gray-900 font-bold py-2 px-4 rounded-lg transition" data-key="nav_signup">Sign Up</button>
             </nav>
             <!-- 行動版漢堡選單按鈕 -->
             <button id="menu-open-btn" class="md:hidden text-2xl">
@@ -58,7 +62,7 @@
             <a href="#features" class="hover:text-amber-400 transition mobile-menu-link" data-key="nav_features">Features</a>
             <a href="#how-it-works" class="hover:text-amber-400 transition mobile-menu-link" data-key="nav_how">How It Works</a>
             <a href="#locations" class="hover:text-amber-400 transition mobile-menu-link" data-key="nav_locations">Locations</a>
-            <a href="#" class="bg-amber-500 hover:bg-amber-600 text-gray-900 font-bold py-3 px-6 rounded-lg transition mt-4 mobile-menu-link" data-key="nav_signup">Sign Up</a>
+            <button class="signup-btn bg-amber-500 hover:bg-amber-600 text-gray-900 font-bold py-3 px-6 rounded-lg transition mt-4 mobile-menu-link" data-key="nav_signup">Sign Up</button>
         </nav>
          <div class="flex items-center space-x-4 text-lg mt-8">
             <button onclick="setLanguage('en')" class="font-semibold hover:text-amber-400 transition">EN</button>
@@ -127,7 +131,7 @@
                         <a href="https://maps.app.goo.gl/tqsAinzTe2SbonTN8" target="_blank" rel="noopener noreferrer" class="group">
                             <div class="flex items-start transition-colors duration-300 group-hover:text-amber-500">
                                 <svg class="w-6 h-6 text-amber-400 mr-3 flex-shrink-0 mt-1 transition-colors duration-300 group-hover:text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                                <span>300新竹市東區金城二路4號</span>
+                                <span data-key="featured_address">300新竹市東區金城二路4號</span>
                             </div>
                         </a>
                         <div class="flex items-center">
@@ -139,7 +143,7 @@
                              <span data-key="featured_amenities">High-Speed Wi-Fi & Power Outlets</span>
                         </div>
                     </div>
-                    <a href="#" class="bg-amber-500 hover:bg-amber-600 text-gray-900 font-bold py-3 px-6 rounded-lg inline-block transition" data-key="featured_book">Book a Spot</a>
+                    <button class="booking-btn bg-amber-500 hover:bg-amber-600 text-gray-900 font-bold py-3 px-6 rounded-lg inline-block transition" data-key="featured_book">Book a Spot</button>
                 </div>
             </div>
         </div>
@@ -148,7 +152,7 @@
     <!-- Features Section -->
     <section id="features" class="py-16 md:py-20 bg-gray-800">
         <div class="container mx-auto px-4">
-            <h3 class="text-3xl md:text-4xl font-bold text-center mb-12 scroll-animate" data-key="why_title">Why Choose Night Owl?</h3>
+            <h3 class="text-3xl md:text-4xl font-bold text-center mb-12 scroll-animate" data-key="why_title">Why Choose Féplace?</h3>
             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <div class="bg-gray-900 p-6 rounded-lg text-center scroll-animate">
                     <h4 class="text-xl font-bold text-amber-400 mb-2" data-key="feature1_title">Flexible Hours</h4>
@@ -174,15 +178,15 @@
     <section class="py-16 md:py-20">
         <div class="container mx-auto px-4 text-center">
             <h3 class="text-3xl md:text-4xl font-bold mb-4 scroll-animate" data-key="cta_title">Ready to Reclaim Your Nights?</h3>
-            <p class="text-gray-400 mb-8 text-lg max-w-xl mx-auto scroll-animate" data-key="cta_subtitle">Join the Night Owl community and discover your new favorite workspace.</p>
-            <button class="bg-amber-500 hover:bg-amber-600 text-gray-900 font-extrabold py-4 px-10 rounded-lg text-xl transition scroll-animate" data-key="cta_button">Get Started Now</button>
+            <p class="text-gray-400 mb-8 text-lg max-w-xl mx-auto scroll-animate" data-key="cta_subtitle">Join the Féplace community and discover your new favorite workspace.</p>
+            <button class="signup-btn bg-amber-500 hover:bg-amber-600 text-gray-900 font-extrabold py-4 px-10 rounded-lg text-xl transition scroll-animate" data-key="cta_button">Get Started Now</button>
         </div>
     </section>
 
     <!-- Footer -->
     <footer class="bg-gray-800 py-8">
         <div class="container mx-auto px-4 text-center text-gray-400">
-            <p data-key="footer_copy">&copy; 2025 Night Owl Cafe. All Rights Reserved.</p>
+            <p data-key="footer_copy">&copy; 2025 Féplace. All Rights Reserved.</p>
             <div class="flex justify-center space-x-4 mt-4">
                 <a href="#" class="hover:text-amber-400" data-key="footer_privacy">Privacy Policy</a>
                 <a href="#" class="hover:text-amber-400" data-key="footer_terms">Terms of Service</a>
@@ -191,11 +195,77 @@
         </div>
     </footer>
 
+    <!-- Modals -->
+    <!-- Booking Modal -->
+    <div id="booking-modal" class="modal hidden fixed inset-0 bg-gray-900 bg-opacity-75 z-50 flex items-center justify-center p-4 opacity-0">
+        <div class="bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6 relative">
+            <button class="modal-close-btn absolute top-4 right-4 text-gray-500 hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h3 class="text-2xl font-bold mb-4" data-key="booking_title">Book a Spot at 日出咖啡</h3>
+            <form id="booking-form">
+                <div class="mb-4">
+                    <label for="booking-date" class="block text-sm font-medium text-gray-300 mb-1" data-key="booking_date">Date</label>
+                    <input type="date" id="booking-date" class="w-full bg-gray-700 border-gray-600 rounded-md p-2 text-white" required>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="start-time" class="block text-sm font-medium text-gray-300 mb-1" data-key="booking_start_time">Start Time</label>
+                        <input type="time" id="start-time" class="w-full bg-gray-700 border-gray-600 rounded-md p-2 text-white" required>
+                    </div>
+                    <div>
+                        <label for="end-time" class="block text-sm font-medium text-gray-300 mb-1" data-key="booking_end_time">End Time</label>
+                        <input type="time" id="end-time" class="w-full bg-gray-700 border-gray-600 rounded-md p-2 text-white" required>
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <label for="guests" class="block text-sm font-medium text-gray-300 mb-1" data-key="booking_guests">Number of Guests</label>
+                    <input type="number" id="guests" min="1" max="10" value="1" class="w-full bg-gray-700 border-gray-600 rounded-md p-2 text-white" required>
+                </div>
+                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-gray-900 font-bold py-3 rounded-lg transition" data-key="booking_confirm">Confirm Booking</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signup-modal" class="modal hidden fixed inset-0 bg-gray-900 bg-opacity-75 z-50 flex items-center justify-center p-4 opacity-0">
+        <div class="bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6 relative">
+            <button class="modal-close-btn absolute top-4 right-4 text-gray-500 hover:text-white">
+                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h3 class="text-2xl font-bold mb-4" data-key="signup_title">Join Féplace</h3>
+            <form id="signup-form">
+                <div class="mb-4">
+                    <label for="name" class="block text-sm font-medium text-gray-300 mb-1" data-key="signup_name">Full Name</label>
+                    <input type="text" id="name" class="w-full bg-gray-700 border-gray-600 rounded-md p-2 text-white" required>
+                </div>
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-gray-300 mb-1" data-key="signup_email">Email Address</label>
+                    <input type="email" id="email" class="w-full bg-gray-700 border-gray-600 rounded-md p-2 text-white" required>
+                </div>
+                <div class="mb-6">
+                    <label for="password" class="block text-sm font-medium text-gray-300 mb-1" data-key="signup_password">Password</label>
+                    <input type="password" id="password" class="w-full bg-gray-700 border-gray-600 rounded-md p-2 text-white" required>
+                </div>
+                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-gray-900 font-bold py-3 rounded-lg transition" data-key="signup_create">Create Account</button>
+            </form>
+            <p class="text-center text-sm text-gray-400 mt-4">
+                <span data-key="signup_already">Already have an account?</span>
+                <a href="#" class="text-amber-400 hover:underline" data-key="signup_login">Log in</a>
+            </p>
+        </div>
+    </div>
+    
+    <!-- Custom Alert Box -->
+    <div id="alert-box" class="hidden fixed top-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg z-50">
+        <p id="alert-message"></p>
+    </div>
+
     <script>
         // --- TRANSLATION DATA ---
         const translations = {
             'en': {
-                'title': 'Night Owl Cafe',
+                'title': 'Féplace',
                 'nav_features': 'Features',
                 'nav_how': 'How It Works',
                 'nav_locations': 'Locations',
@@ -213,11 +283,12 @@
                 'how_step3_title': '3. Work & Enjoy',
                 'how_step3_desc': 'Show up, connect to Wi-Fi, and get to work. Enjoy the unique ambiance of a cafe after dark.',
                 'featured_title': 'Featured Location',
+                'featured_address': 'No. 4, Jincheng 2nd Rd, East District, Hsinchu City, 300',
                 'featured_desc': 'A cozy and modern cafe known for its specialty coffee and welcoming atmosphere. Perfect for focused work or quiet contemplation after the sun goes down.',
                 'featured_hours': 'Night Owl Hours: 7:00 PM - 1:00 AM',
                 'featured_amenities': 'High-Speed Wi-Fi & Power Outlets',
                 'featured_book': 'Book a Spot',
-                'why_title': 'Why Choose Night Owl?',
+                'why_title': 'Why Choose Féplace?',
                 'feature1_title': 'Flexible Hours',
                 'feature1_desc': 'Work on your schedule. Our spaces are available when traditional co-working spots are closed.',
                 'feature2_title': 'Unique Ambiance',
@@ -227,15 +298,30 @@
                 'feature4_title': 'Community',
                 'feature4_desc': 'Connect with fellow night owls, freelancers, and creatives in a relaxed setting.',
                 'cta_title': 'Ready to Reclaim Your Nights?',
-                'cta_subtitle': 'Join the Night Owl community and discover your new favorite workspace.',
+                'cta_subtitle': 'Join the Féplace community and discover your new favorite workspace.',
                 'cta_button': 'Get Started Now',
-                'footer_copy': '© 2025 Night Owl Cafe. All Rights Reserved.',
+                'footer_copy': '© 2025 Féplace. All Rights Reserved.',
                 'footer_privacy': 'Privacy Policy',
                 'footer_terms': 'Terms of Service',
-                'footer_contact': 'Contact'
+                'footer_contact': 'Contact',
+                'booking_title': 'Book a Spot at Sunrise Cafe',
+                'booking_date': 'Date',
+                'booking_start_time': 'Start Time',
+                'booking_end_time': 'End Time',
+                'booking_guests': 'Number of Guests',
+                'booking_confirm': 'Confirm Booking',
+                'booking_success': 'Booking confirmed! A confirmation has been sent to your email.',
+                'signup_title': 'Join Féplace',
+                'signup_name': 'Full Name',
+                'signup_email': 'Email Address',
+                'signup_password': 'Password',
+                'signup_create': 'Create Account',
+                'signup_already': 'Already have an account?',
+                'signup_login': 'Log in',
+                'signup_success': 'Welcome! Your account has been created successfully.'
             },
             'zh-tw': {
-                'title': '夜貓咖啡',
+                'title': 'Féplace',
                 'nav_features': '特色',
                 'nav_how': '如何運作',
                 'nav_locations': '地點',
@@ -253,11 +339,12 @@
                 'how_step3_title': '3. 開始工作與享受',
                 'how_step3_desc': '到場後，連接Wi-Fi，即可開始工作。享受深夜咖啡館的獨特氛圍。',
                 'featured_title': '特色地點',
+                'featured_address': '300新竹市東區金城二路4號',
                 'featured_desc': '一家舒適現代的咖啡館，以其特色咖啡和熱情的氛圍而聞名。太陽下山後，這裡是專心工作或靜心思考的完美場所。',
                 'featured_hours': '夜貓時段：晚上 7:00 - 凌晨 1:00',
                 'featured_amenities': '高速 Wi-Fi 和電源插座',
                 'featured_book': '預訂座位',
-                'why_title': '為何選擇夜貓咖啡？',
+                'why_title': '為何選擇Féplace？',
                 'feature1_title': '彈性時間',
                 'feature1_desc': '按照您的時間表工作。當傳統共享辦公空間關閉時，我們的空間仍然可用。',
                 'feature2_title': '獨特氛圍',
@@ -267,30 +354,117 @@
                 'feature4_title': '社群',
                 'feature4_desc': '在輕鬆的環境中與其他夜貓子、自由工作者和創意人士建立聯繫。',
                 'cta_title': '準備好重拾您的夜晚了嗎？',
-                'cta_subtitle': '加入夜貓社群，發現您最愛的新工作空間。',
+                'cta_subtitle': '加入Féplace社群，發現您最愛的新工作空間。',
                 'cta_button': '立即開始',
-                'footer_copy': '© 2025 夜貓咖啡. 版權所有.',
+                'footer_copy': '© 2025 Féplace. 版權所有.',
                 'footer_privacy': '隱私政策',
                 'footer_terms': '服務條款',
-                'footer_contact': '聯絡我們'
+                'footer_contact': '聯絡我們',
+                'booking_title': '預訂 日出咖啡 的座位',
+                'booking_date': '日期',
+                'booking_start_time': '開始時間',
+                'booking_end_time': '結束時間',
+                'booking_guests': '人數',
+                'booking_confirm': '確認預訂',
+                'booking_success': '預訂成功！確認信已寄至您的電子信箱。',
+                'signup_title': '加入 Féplace',
+                'signup_name': '全名',
+                'signup_email': '電子郵件地址',
+                'signup_password': '密碼',
+                'signup_create': '建立帳戶',
+                'signup_already': '已經有帳戶了？',
+                'signup_login': '登入',
+                'signup_success': '歡迎！您的帳戶已成功建立。'
             }
         };
 
-        // --- LANGUAGE SWITCHING LOGIC ---
         let currentLang = 'en';
+
+        // --- UTILITY FUNCTIONS ---
         function setLanguage(lang) {
             currentLang = lang;
-            const elements = document.querySelectorAll('[data-key]');
-            elements.forEach(element => {
+            document.documentElement.lang = lang;
+            document.querySelectorAll('[data-key]').forEach(element => {
                 const key = element.getAttribute('data-key');
-                if (translations[lang] && translations[lang][key]) {
-                    element.textContent = translations[lang][key];
+                if (translations[lang]?.[key]) {
+                    // For anchor tags with complex inner content, we search for the span to change its text
+                    if(element.tagName === 'A' && element.querySelector('span')) {
+                        element.querySelector('span').textContent = translations[lang][key];
+                    } else {
+                        element.textContent = translations[lang][key];
+                    }
                 }
             });
-            document.documentElement.lang = lang;
+        }
+        
+        function showAlert(messageKey) {
+            const alertBox = document.getElementById('alert-box');
+            const alertMessage = document.getElementById('alert-message');
+            
+            alertMessage.textContent = translations[currentLang][messageKey] || messageKey;
+            alertBox.classList.remove('hidden');
+            
+            setTimeout(() => {
+                alertBox.classList.add('hidden');
+            }, 3000);
         }
 
-        // --- DYNAMIC SCROLL ANIMATION LOGIC ---
+        // --- MODAL LOGIC ---
+        function setupModals() {
+            const bookingModal = document.getElementById('booking-modal');
+            const signupModal = document.getElementById('signup-modal');
+            
+            const openModal = (modal) => {
+                modal.classList.remove('hidden');
+                setTimeout(() => modal.classList.add('opacity-100'), 10);
+            };
+
+            const closeModal = (modal) => {
+                modal.classList.remove('opacity-100');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            };
+
+            // Event listeners to open modals
+            document.querySelectorAll('.booking-btn').forEach(btn => 
+                btn.addEventListener('click', () => openModal(bookingModal))
+            );
+            document.querySelectorAll('.signup-btn').forEach(btn => 
+                btn.addEventListener('click', () => openModal(signupModal))
+            );
+
+            // Event listeners to close modals
+            document.querySelectorAll('.modal-close-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    closeModal(bookingModal);
+                    closeModal(signupModal);
+                });
+            });
+
+            // Close modal on background click
+            [bookingModal, signupModal].forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        closeModal(modal);
+                    }
+                });
+            });
+
+            // Form submission logic
+            document.getElementById('booking-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                closeModal(bookingModal);
+                showAlert('booking_success');
+            });
+
+            document.getElementById('signup-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                closeModal(signupModal);
+                showAlert('signup_success');
+            });
+        }
+
+
+        // --- SCROLL ANIMATION LOGIC ---
         function setupScrollAnimation() {
             const animatedElements = document.querySelectorAll('.scroll-animate');
             const observer = new IntersectionObserver((entries) => {
@@ -313,11 +487,18 @@
             const menu = document.getElementById('mobile-menu');
             const menuLinks = document.querySelectorAll('.mobile-menu-link');
 
-            const toggleMenu = () => menu.classList.toggle('hidden');
+            const openMenu = () => menu.classList.remove('hidden');
+            const closeMenu = () => menu.classList.add('hidden');
             
-            openBtn.addEventListener('click', toggleMenu);
-            closeBtn.addEventListener('click', toggleMenu);
-            menuLinks.forEach(link => link.addEventListener('click', toggleMenu));
+            openBtn.addEventListener('click', openMenu);
+            closeBtn.addEventListener('click', closeMenu);
+            menuLinks.forEach(link => {
+                // If the link is not a signup button, it should close the menu.
+                // The signup button inside the menu will be handled by the modal logic.
+                if (!link.classList.contains('signup-btn')) {
+                    link.addEventListener('click', closeMenu);
+                }
+            });
         }
 
         // --- INITIALIZATION ---
@@ -328,6 +509,7 @@
 
             setupScrollAnimation();
             setupMobileMenu();
+            setupModals();
         });
     </script>
 
