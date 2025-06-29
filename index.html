@@ -27,6 +27,19 @@
         .modal {
             transition: opacity 0.3s ease;
         }
+        /* 圖片輪播 */
+        .slider-container {
+            position: relative;
+            overflow: hidden;
+        }
+        .slider-wrapper {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+        .slider-item {
+            min-width: 100%;
+            box-sizing: border-box;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white">
@@ -119,11 +132,21 @@
     <section id="locations" class="py-16 md:py-20">
         <div class="container mx-auto px-4">
             <h3 class="text-3xl md:text-4xl font-bold text-center mb-12 scroll-animate" data-key="featured_title">Featured Location</h3>
-            <div class="bg-gray-800 rounded-lg overflow-hidden md:flex shadow-lg scroll-animate">
-                <div class="md:w-1/2">
-                    <img src="https://lh3.googleusercontent.com/gps-cs-s/AC9h4npZPW47w7xxjxrrHgcc9kQy3XURlYSQtr6JIAcMZ9u3TuD7tHPfNHxIp5c7n7Hb5sRq_ctZ6F-8WdzIfH-3Gsc9ouqCUxkggoAAjETu21fo8DRYZEZXV6vds34L36nQnRU0WtzYNQ=s1024-v1" alt="日出咖啡 (Sunrise Cafe) 內部" class="w-full h-64 md:h-full object-cover">
+            <div class="bg-gray-800 rounded-lg overflow-hidden md:flex md:items-stretch shadow-lg scroll-animate">
+                <div class="md:w-1/2 slider-container">
+                    <div class="slider-wrapper">
+                        <img src="https://lh3.googleusercontent.com/gps-cs-s/AC9h4npZPW47w7xxjxrrHgcc9kQy3XURlYSQtr6JIAcMZ9u3TuD7tHPfNHxIp5c7n7Hb5sRq_ctZ6F-8WdzIfH-3Gsc9ouqCUxkggoAAjETu21fo8DRYZEZXV6vds34L36nQnRU0WtzYNQ=s1024-v1" alt="日出咖啡 (Sunrise Cafe) 內部一" class="slider-item w-full h-64 md:h-full object-cover">
+                        <img src="https://lh3.googleusercontent.com/gps-cs-s/AC9h4nqNclYXiOWnsEX84e9LQuSh812bwNeRqVmpu87skF5V9AcNBgUIfq22nsn4YPMURKSjyG0jywC8OuyK7csvfLxV8djh2INyenKijwkZZtFKaqfaNfOricGkOzNl4eDgSmm9QNTfqQ=s1024-v1" alt="日出咖啡 (Sunrise Cafe) 內部二" class="slider-item w-full h-64 md:h-full object-cover">
+                        <img src="https://lh3.googleusercontent.com/gps-cs-s/AC9h4nrrfGB_L5N7tH45dyK6qarNtPZwJykTKfdON1pmVDTymVdOnSQXS_gSVDGybDmEtgOyELmZ58K_UigQUHrJt4NTL3E_ntsx1R10tDmJh8rnB_VzN8gFpFU76BnCbiYpvKZiD0PC=s626-k-no" alt="日出咖啡 (Sunrise Cafe) 外部" class="slider-item w-full h-64 md:h-full object-cover">
+                    </div>
+                    <button class="slider-prev absolute top-1/2 left-2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition">
+                        &#10094;
+                    </button>
+                    <button class="slider-next absolute top-1/2 right-2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition">
+                        &#10095;
+                    </button>
                 </div>
-                <div class="md:w-1/2 p-6 md:p-8 lg:p-12">
+                <div class="md:w-1/2 p-6 md:p-8 lg:p-12 flex flex-col justify-center">
                     <h4 class="text-2xl lg:text-3xl font-bold mb-2">日出咖啡 (Sunrise Cafe)</h4>
                     <p class="text-amber-400 mb-4">Hsinchu, Taiwan</p>
                     <p class="text-gray-300 mb-6" data-key="featured_desc">A cozy and modern cafe known for its specialty coffee and welcoming atmosphere. Perfect for focused work or quiet contemplation after the sun goes down.</p>
@@ -387,7 +410,6 @@
             document.querySelectorAll('[data-key]').forEach(element => {
                 const key = element.getAttribute('data-key');
                 if (translations[lang]?.[key]) {
-                    // For anchor tags with complex inner content, we search for the span to change its text
                     if(element.tagName === 'A' && element.querySelector('span')) {
                         element.querySelector('span').textContent = translations[lang][key];
                     } else {
@@ -424,7 +446,6 @@
                 setTimeout(() => modal.classList.add('hidden'), 300);
             };
 
-            // Event listeners to open modals
             document.querySelectorAll('.booking-btn').forEach(btn => 
                 btn.addEventListener('click', () => openModal(bookingModal))
             );
@@ -432,7 +453,6 @@
                 btn.addEventListener('click', () => openModal(signupModal))
             );
 
-            // Event listeners to close modals
             document.querySelectorAll('.modal-close-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     closeModal(bookingModal);
@@ -440,7 +460,6 @@
                 });
             });
 
-            // Close modal on background click
             [bookingModal, signupModal].forEach(modal => {
                 modal.addEventListener('click', (e) => {
                     if (e.target === modal) {
@@ -449,7 +468,6 @@
                 });
             });
 
-            // Form submission logic
             document.getElementById('booking-form').addEventListener('submit', (e) => {
                 e.preventDefault();
                 closeModal(bookingModal);
@@ -493,11 +511,33 @@
             openBtn.addEventListener('click', openMenu);
             closeBtn.addEventListener('click', closeMenu);
             menuLinks.forEach(link => {
-                // If the link is not a signup button, it should close the menu.
-                // The signup button inside the menu will be handled by the modal logic.
                 if (!link.classList.contains('signup-btn')) {
                     link.addEventListener('click', closeMenu);
                 }
+            });
+        }
+        
+        // --- SLIDER LOGIC ---
+        function setupSlider() {
+            const sliderWrapper = document.querySelector('.slider-wrapper');
+            const prevBtn = document.querySelector('.slider-prev');
+            const nextBtn = document.querySelector('.slider-next');
+            const slides = document.querySelectorAll('.slider-item');
+            let currentIndex = 0;
+            const totalSlides = slides.length;
+
+            function goToSlide(index) {
+                sliderWrapper.style.transform = `translateX(-${index * 100}%)`;
+            }
+
+            prevBtn.addEventListener('click', () => {
+                currentIndex = (currentIndex > 0) ? currentIndex - 1 : totalSlides - 1;
+                goToSlide(currentIndex);
+            });
+
+            nextBtn.addEventListener('click', () => {
+                currentIndex = (currentIndex < totalSlides - 1) ? currentIndex + 1 : 0;
+                goToSlide(currentIndex);
             });
         }
 
@@ -510,6 +550,7 @@
             setupScrollAnimation();
             setupMobileMenu();
             setupModals();
+            setupSlider();
         });
     </script>
 
