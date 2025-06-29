@@ -1,160 +1,335 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>深夜共享咖啡廳平台</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --primary: #1E1E2F;
-      --accent: #FFD369;
-      --light: #FAFAFA;
-      --gray: #999;
-    }
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Inter', sans-serif;
-    }
-    body {
-      background-color: var(--primary);
-      color: var(--light);
-      line-height: 1.6;
-    }
-    header {
-      padding: 4rem 2rem;
-      text-align: center;
-      background: linear-gradient(to bottom, #1E1E2F, #111);
-    }
-    header h1 {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-    }
-    header p {
-      font-size: 1.2rem;
-      color: var(--gray);
-    }
-    .cta-buttons {
-      margin-top: 2rem;
-    }
-    .cta-buttons a {
-      padding: 0.8rem 1.5rem;
-      margin: 0 0.5rem;
-      border-radius: 8px;
-      background-color: var(--accent);
-      color: #000;
-      text-decoration: none;
-      font-weight: bold;
-      transition: background 0.3s;
-    }
-    .cta-buttons a:hover {
-      background-color: #f8c948;
-    }
-    section {
-      padding: 4rem 2rem;
-      max-width: 960px;
-      margin: 0 auto;
-    }
-    section h2 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-      text-align: center;
-    }
-    .steps, .benefits, .testimonials {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 2rem;
-    }
-    .card {
-      background-color: #2A2A3B;
-      padding: 1.5rem;
-      border-radius: 1rem;
-    }
-    .card h3 {
-      margin-bottom: 0.5rem;
-    }
-    footer {
-      text-align: center;
-      padding: 2rem;
-      font-size: 0.9rem;
-      color: var(--gray);
-      background-color: #111;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Night Owl Cafe - Your After-Hours Workspace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .hero-bg {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=2940&auto=format&fit=crop') center center/cover no-repeat;
+        }
+        /* 動態渲染效果的 CSS */
+        .scroll-animate {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .scroll-animate.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
 </head>
-<body>
-  <header>
-    <h1>讓深夜也能營收</h1>
-    <p>將您的咖啡廳座位變成自動獲利的共享空間</p>
-    <div class="cta-buttons">
-      <a href="#contact">立即加入合作</a>
-      <a href="#demo">觀看示範影片</a>
-    </div>
-  </header>
+<body class="bg-gray-900 text-white">
 
-  <section id="how-it-works">
-    <h2>輕鬆三步，立即上架您的空間</h2>
-    <div class="steps">
-      <div class="card">
-        <h3>1. 上傳資訊</h3>
-        <p>填寫空間資訊與照片，我們幫您上架。</p>
-      </div>
-      <div class="card">
-        <h3>2. 安裝設備</h3>
-        <p>協助安裝監控與開門裝置，保障安全。</p>
-      </div>
-      <div class="card">
-        <h3>3. 自動營運</h3>
-        <p>用戶掃碼預約進場，全程無人化營運。</p>
-      </div>
-    </div>
-  </section>
+    <!-- Header -->
+    <header class="absolute top-0 left-0 w-full z-20 p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold" data-key="title">Night Owl Cafe</h1>
+            <nav class="hidden md:flex space-x-6 items-center">
+                <a href="#features" class="hover:text-amber-400 transition" data-key="nav_features">Features</a>
+                <a href="#how-it-works" class="hover:text-amber-400 transition" data-key="nav_how">How It Works</a>
+                <a href="#locations" class="hover:text-amber-400 transition" data-key="nav_locations">Locations</a>
+                <div class="flex items-center space-x-2 text-sm">
+                    <button onclick="setLanguage('en')" class="font-semibold hover:text-amber-400 transition">EN</button>
+                    <span>/</span>
+                    <button onclick="setLanguage('zh-tw')" class="font-semibold hover:text-amber-400 transition">繁中</button>
+                </div>
+                <a href="#" class="bg-amber-500 hover:bg-amber-600 text-gray-900 font-bold py-2 px-4 rounded-lg transition" data-key="nav_signup">Sign Up</a>
+            </nav>
+            <!-- 行動版漢堡選單按鈕 -->
+            <button id="menu-open-btn" class="md:hidden text-2xl">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+    </header>
 
-  <section id="benefits">
-    <h2>平台優勢</h2>
-    <div class="benefits">
-      <div class="card">
-        <h3>化閒置為收入</h3>
-        <p>深夜無營運？讓座位自動為您創造營收。</p>
-      </div>
-      <div class="card">
-        <h3>全自動管理</h3>
-        <p>不需額外人力，平台自動處理預約與進出。</p>
-      </div>
-      <div class="card">
-        <h3>保障安全</h3>
-        <p>監視器、合約、保險三重保障降低風險。</p>
-      </div>
+    <!-- 行動版選單 (預設隱藏) -->
+    <div id="mobile-menu" class="hidden fixed inset-0 bg-gray-900 bg-opacity-95 z-50 flex flex-col items-center justify-center">
+        <button id="menu-close-btn" class="absolute top-5 right-5 text-3xl">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+        <nav class="flex flex-col items-center space-y-8 text-2xl">
+            <a href="#features" class="hover:text-amber-400 transition mobile-menu-link" data-key="nav_features">Features</a>
+            <a href="#how-it-works" class="hover:text-amber-400 transition mobile-menu-link" data-key="nav_how">How It Works</a>
+            <a href="#locations" class="hover:text-amber-400 transition mobile-menu-link" data-key="nav_locations">Locations</a>
+            <a href="#" class="bg-amber-500 hover:bg-amber-600 text-gray-900 font-bold py-3 px-6 rounded-lg transition mt-4 mobile-menu-link" data-key="nav_signup">Sign Up</a>
+        </nav>
+         <div class="flex items-center space-x-4 text-lg mt-8">
+            <button onclick="setLanguage('en')" class="font-semibold hover:text-amber-400 transition">EN</button>
+            <span class="text-gray-500">/</span>
+            <button onclick="setLanguage('zh-tw')" class="font-semibold hover:text-amber-400 transition">繁中</button>
+        </div>
     </div>
-  </section>
 
-  <section id="testimonials">
-    <h2>合作店家怎麼說？</h2>
-    <div class="testimonials">
-      <div class="card">
-        <h3>小日光咖啡</h3>
-        <p>「晚上不營業的時段現在每月可以多賺 $20,000，完全自動化，超省事。」</p>
-      </div>
-      <div class="card">
-        <h3>森之夜 Cafe</h3>
-        <p>「原本浪費的空間變成穩定收益，推薦給所有開店的朋友。」</p>
-      </div>
-    </div>
-  </section>
 
-  <section id="contact">
-    <h2>立即加入首批合作</h2>
-    <p style="text-align:center;margin:1rem auto;max-width:600px;">我們將為前 30 間店家提供免費導流與建置折扣，讓您零風險體驗平台收益。</p>
-    <div class="cta-buttons" style="text-align:center;">
-      <a href="mailto:hello@nightcafe.tw">預約顧問</a>
-      <a href="#">下載合作說明書</a>
-    </div>
-  </section>
+    <!-- Hero Section -->
+    <section class="hero-bg h-screen flex items-center justify-center">
+        <div class="text-center px-4">
+            <h2 class="text-4xl sm:text-5xl md:text-7xl font-extrabold mb-4 leading-tight" data-key="hero_title">Unlock the Night: Your After-Hours Workspace</h2>
+            <p class="text-base md:text-xl text-gray-300 mb-8 max-w-2xl mx-auto" data-key="hero_subtitle">Turn quiet cafe nights into your next productive session. Find and book unique, inspiring spaces when you need them most.</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#locations" class="bg-amber-500 hover:bg-amber-600 text-gray-900 font-bold py-3 px-8 rounded-lg text-lg transition" data-key="hero_explore">Explore Cafes</a>
+                <a href="#how-it-works" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-lg text-lg transition" data-key="hero_learn">Learn More</a>
+            </div>
+        </div>
+    </section>
 
-  <footer>
-    © 2025 深夜共享咖啡平台 NightCafe. All rights reserved.
-  </footer>
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="py-16 md:py-20 bg-gray-800">
+        <div class="container mx-auto px-4 text-center">
+            <h3 class="text-3xl md:text-4xl font-bold mb-2 scroll-animate" data-key="how_title">How It Works</h3>
+            <p class="text-gray-400 mb-12 scroll-animate" data-key="how_subtitle">Productivity in three simple steps.</p>
+            <div class="grid md:grid-cols-3 gap-10 md:gap-12">
+                <div class="flex flex-col items-center scroll-animate">
+                    <div class="bg-gray-700 p-6 rounded-full mb-4">
+                        <svg class="w-12 h-12 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                    <h4 class="text-xl md:text-2xl font-bold mb-2" data-key="how_step1_title">1. Find a Space</h4>
+                    <p class="text-gray-400" data-key="how_step1_desc">Browse our curated list of late-night cafes. Filter by location, amenities, and vibe.</p>
+                </div>
+                <div class="flex flex-col items-center scroll-animate" style="transition-delay: 200ms;">
+                    <div class="bg-gray-700 p-6 rounded-full mb-4">
+                        <svg class="w-12 h-12 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <h4 class="text-xl md:text-2xl font-bold mb-2" data-key="how_step2_title">2. Book Your Spot</h4>
+                    <p class="text-gray-400" data-key="how_step2_desc">Reserve your table or seat for the hours you need. Secure and simple online payment.</p>
+                </div>
+                <div class="flex flex-col items-center scroll-animate" style="transition-delay: 400ms;">
+                    <div class="bg-gray-700 p-6 rounded-full mb-4">
+                        <svg class="w-12 h-12 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
+                    </div>
+                    <h4 class="text-xl md:text-2xl font-bold mb-2" data-key="how_step3_title">3. Work & Enjoy</h4>
+                    <p class="text-gray-400" data-key="how_step3_desc">Show up, connect to Wi-Fi, and get to work. Enjoy the unique ambiance of a cafe after dark.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Featured Location Section -->
+    <section id="locations" class="py-16 md:py-20">
+        <div class="container mx-auto px-4">
+            <h3 class="text-3xl md:text-4xl font-bold text-center mb-12 scroll-animate" data-key="featured_title">Featured Location</h3>
+            <div class="bg-gray-800 rounded-lg overflow-hidden md:flex shadow-lg scroll-animate">
+                <div class="md:w-1/2">
+                    <img src="https://lh3.googleusercontent.com/gps-cs-s/AC9h4npZPW47w7xxjxrrHgcc9kQy3XURlYSQtr6JIAcMZ9u3TuD7tHPfNHxIp5c7n7Hb5sRq_ctZ6F-8WdzIfH-3Gsc9ouqCUxkggoAAjETu21fo8DRYZEZXV6vds34L36nQnRU0WtzYNQ=s1024-v1" alt="日出咖啡 (Sunrise Cafe) 內部" class="w-full h-64 md:h-full object-cover">
+                </div>
+                <div class="md:w-1/2 p-6 md:p-8 lg:p-12">
+                    <h4 class="text-2xl lg:text-3xl font-bold mb-2">日出咖啡 (Sunrise Cafe)</h4>
+                    <p class="text-amber-400 mb-4">Hsinchu, Taiwan</p>
+                    <p class="text-gray-300 mb-6" data-key="featured_desc">A cozy and modern cafe known for its specialty coffee and welcoming atmosphere. Perfect for focused work or quiet contemplation after the sun goes down.</p>
+                    <div class="flex flex-col space-y-3 mb-6">
+                        <a href="https://maps.app.goo.gl/tqsAinzTe2SbonTN8" target="_blank" rel="noopener noreferrer" class="group">
+                            <div class="flex items-start transition-colors duration-300 group-hover:text-amber-500">
+                                <svg class="w-6 h-6 text-amber-400 mr-3 flex-shrink-0 mt-1 transition-colors duration-300 group-hover:text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                <span>300新竹市東區金城二路4號</span>
+                            </div>
+                        </a>
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 text-amber-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span data-key="featured_hours">Night Owl Hours: 7:00 PM - 1:00 AM</span>
+                        </div>
+                         <div class="flex items-center">
+                            <svg class="w-6 h-6 text-amber-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"></path></svg>
+                             <span data-key="featured_amenities">High-Speed Wi-Fi & Power Outlets</span>
+                        </div>
+                    </div>
+                    <a href="#" class="bg-amber-500 hover:bg-amber-600 text-gray-900 font-bold py-3 px-6 rounded-lg inline-block transition" data-key="featured_book">Book a Spot</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-16 md:py-20 bg-gray-800">
+        <div class="container mx-auto px-4">
+            <h3 class="text-3xl md:text-4xl font-bold text-center mb-12 scroll-animate" data-key="why_title">Why Choose Night Owl?</h3>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="bg-gray-900 p-6 rounded-lg text-center scroll-animate">
+                    <h4 class="text-xl font-bold text-amber-400 mb-2" data-key="feature1_title">Flexible Hours</h4>
+                    <p class="text-gray-400" data-key="feature1_desc">Work on your schedule. Our spaces are available when traditional co-working spots are closed.</p>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-lg text-center scroll-animate" style="transition-delay: 200ms;">
+                    <h4 class="text-xl font-bold text-amber-400 mb-2" data-key="feature2_title">Unique Ambiance</h4>
+                    <p class="text-gray-400" data-key="feature2_desc">Experience the focus and calm of a cafe at night. Less noise, more flow.</p>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-lg text-center scroll-animate" style="transition-delay: 400ms;">
+                    <h4 class="text-xl font-bold text-amber-400 mb-2" data-key="feature3_title">Curated Locations</h4>
+                    <p class="text-gray-400" data-key="feature3_desc">We partner with the best independent cafes, each with its own character and charm.</p>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-lg text-center scroll-animate" style="transition-delay: 600ms;">
+                    <h4 class="text-xl font-bold text-amber-400 mb-2" data-key="feature4_title">Community</h4>
+                    <p class="text-gray-400" data-key="feature4_desc">Connect with fellow night owls, freelancers, and creatives in a relaxed setting.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section class="py-16 md:py-20">
+        <div class="container mx-auto px-4 text-center">
+            <h3 class="text-3xl md:text-4xl font-bold mb-4 scroll-animate" data-key="cta_title">Ready to Reclaim Your Nights?</h3>
+            <p class="text-gray-400 mb-8 text-lg max-w-xl mx-auto scroll-animate" data-key="cta_subtitle">Join the Night Owl community and discover your new favorite workspace.</p>
+            <button class="bg-amber-500 hover:bg-amber-600 text-gray-900 font-extrabold py-4 px-10 rounded-lg text-xl transition scroll-animate" data-key="cta_button">Get Started Now</button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 py-8">
+        <div class="container mx-auto px-4 text-center text-gray-400">
+            <p data-key="footer_copy">&copy; 2025 Night Owl Cafe. All Rights Reserved.</p>
+            <div class="flex justify-center space-x-4 mt-4">
+                <a href="#" class="hover:text-amber-400" data-key="footer_privacy">Privacy Policy</a>
+                <a href="#" class="hover:text-amber-400" data-key="footer_terms">Terms of Service</a>
+                <a href="#" class="hover:text-amber-400" data-key="footer_contact">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- TRANSLATION DATA ---
+        const translations = {
+            'en': {
+                'title': 'Night Owl Cafe',
+                'nav_features': 'Features',
+                'nav_how': 'How It Works',
+                'nav_locations': 'Locations',
+                'nav_signup': 'Sign Up',
+                'hero_title': 'Unlock the Night: Your After-Hours Workspace',
+                'hero_subtitle': 'Turn quiet cafe nights into your next productive session. Find and book unique, inspiring spaces when you need them most.',
+                'hero_explore': 'Explore Cafes',
+                'hero_learn': 'Learn More',
+                'how_title': 'How It Works',
+                'how_subtitle': 'Productivity in three simple steps.',
+                'how_step1_title': '1. Find a Space',
+                'how_step1_desc': 'Browse our curated list of late-night cafes. Filter by location, amenities, and vibe.',
+                'how_step2_title': '2. Book Your Spot',
+                'how_step2_desc': 'Reserve your table or seat for the hours you need. Secure and simple online payment.',
+                'how_step3_title': '3. Work & Enjoy',
+                'how_step3_desc': 'Show up, connect to Wi-Fi, and get to work. Enjoy the unique ambiance of a cafe after dark.',
+                'featured_title': 'Featured Location',
+                'featured_desc': 'A cozy and modern cafe known for its specialty coffee and welcoming atmosphere. Perfect for focused work or quiet contemplation after the sun goes down.',
+                'featured_hours': 'Night Owl Hours: 7:00 PM - 1:00 AM',
+                'featured_amenities': 'High-Speed Wi-Fi & Power Outlets',
+                'featured_book': 'Book a Spot',
+                'why_title': 'Why Choose Night Owl?',
+                'feature1_title': 'Flexible Hours',
+                'feature1_desc': 'Work on your schedule. Our spaces are available when traditional co-working spots are closed.',
+                'feature2_title': 'Unique Ambiance',
+                'feature2_desc': 'Experience the focus and calm of a cafe at night. Less noise, more flow.',
+                'feature3_title': 'Curated Locations',
+                'feature3_desc': 'We partner with the best independent cafes, each with its own character and charm.',
+                'feature4_title': 'Community',
+                'feature4_desc': 'Connect with fellow night owls, freelancers, and creatives in a relaxed setting.',
+                'cta_title': 'Ready to Reclaim Your Nights?',
+                'cta_subtitle': 'Join the Night Owl community and discover your new favorite workspace.',
+                'cta_button': 'Get Started Now',
+                'footer_copy': '© 2025 Night Owl Cafe. All Rights Reserved.',
+                'footer_privacy': 'Privacy Policy',
+                'footer_terms': 'Terms of Service',
+                'footer_contact': 'Contact'
+            },
+            'zh-tw': {
+                'title': '夜貓咖啡',
+                'nav_features': '特色',
+                'nav_how': '如何運作',
+                'nav_locations': '地點',
+                'nav_signup': '註冊',
+                'hero_title': '解鎖夜晚：您的午夜工作空間',
+                'hero_subtitle': '將寧靜的咖啡館夜晚變成您下一個高效的工作時光。尋找並預訂您最需要的獨特、啟發靈感的空間。',
+                'hero_explore': '探索咖啡館',
+                'hero_learn': '了解更多',
+                'how_title': '如何運作',
+                'how_subtitle': '三個簡單步驟，提升生產力。',
+                'how_step1_title': '1. 尋找空間',
+                'how_step1_desc': '瀏覽我們精選的深夜咖啡館列表。按地點、設施和氛圍進行篩選。',
+                'how_step2_title': '2. 預訂您的位置',
+                'how_step2_desc': '預訂您需要的時段的桌子或座位。安全便捷的線上支付。',
+                'how_step3_title': '3. 開始工作與享受',
+                'how_step3_desc': '到場後，連接Wi-Fi，即可開始工作。享受深夜咖啡館的獨特氛圍。',
+                'featured_title': '特色地點',
+                'featured_desc': '一家舒適現代的咖啡館，以其特色咖啡和熱情的氛圍而聞名。太陽下山後，這裡是專心工作或靜心思考的完美場所。',
+                'featured_hours': '夜貓時段：晚上 7:00 - 凌晨 1:00',
+                'featured_amenities': '高速 Wi-Fi 和電源插座',
+                'featured_book': '預訂座位',
+                'why_title': '為何選擇夜貓咖啡？',
+                'feature1_title': '彈性時間',
+                'feature1_desc': '按照您的時間表工作。當傳統共享辦公空間關閉時，我們的空間仍然可用。',
+                'feature2_title': '獨特氛圍',
+                'feature2_desc': '體驗夜晚咖啡館的專注與寧靜。更少噪音，更多流暢。',
+                'feature3_title': '精選地點',
+                'feature3_desc': '我們與最優質的獨立咖啡館合作，每一家都有自己的特色和魅力。',
+                'feature4_title': '社群',
+                'feature4_desc': '在輕鬆的環境中與其他夜貓子、自由工作者和創意人士建立聯繫。',
+                'cta_title': '準備好重拾您的夜晚了嗎？',
+                'cta_subtitle': '加入夜貓社群，發現您最愛的新工作空間。',
+                'cta_button': '立即開始',
+                'footer_copy': '© 2025 夜貓咖啡. 版權所有.',
+                'footer_privacy': '隱私政策',
+                'footer_terms': '服務條款',
+                'footer_contact': '聯絡我們'
+            }
+        };
+
+        // --- LANGUAGE SWITCHING LOGIC ---
+        let currentLang = 'en';
+        function setLanguage(lang) {
+            currentLang = lang;
+            const elements = document.querySelectorAll('[data-key]');
+            elements.forEach(element => {
+                const key = element.getAttribute('data-key');
+                if (translations[lang] && translations[lang][key]) {
+                    element.textContent = translations[lang][key];
+                }
+            });
+            document.documentElement.lang = lang;
+        }
+
+        // --- DYNAMIC SCROLL ANIMATION LOGIC ---
+        function setupScrollAnimation() {
+            const animatedElements = document.querySelectorAll('.scroll-animate');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1 
+            });
+            animatedElements.forEach(el => observer.observe(el));
+        }
+        
+        // --- MOBILE MENU LOGIC ---
+        function setupMobileMenu() {
+            const openBtn = document.getElementById('menu-open-btn');
+            const closeBtn = document.getElementById('menu-close-btn');
+            const menu = document.getElementById('mobile-menu');
+            const menuLinks = document.querySelectorAll('.mobile-menu-link');
+
+            const toggleMenu = () => menu.classList.toggle('hidden');
+            
+            openBtn.addEventListener('click', toggleMenu);
+            closeBtn.addEventListener('click', toggleMenu);
+            menuLinks.forEach(link => link.addEventListener('click', toggleMenu));
+        }
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const userLang = navigator.language || navigator.userLanguage;
+            const initialLang = userLang.startsWith('zh') ? 'zh-tw' : 'en';
+            setLanguage(initialLang); 
+
+            setupScrollAnimation();
+            setupMobileMenu();
+        });
+    </script>
+
 </body>
 </html>
