@@ -1,485 +1,412 @@
+
 <!doctype html>
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dinner-Swap — 搶先體驗</title>
+  <title>Dinner-Swap｜用餐交換，讓相遇更有溫度</title>
+  <meta name="description" content="不再尬聊 — 用一份晚餐，開始真誠的對話。配對 -> 選餐 -> 我們幫你下單 -> 揭開面紗。加入 Early Access。" />
 
-  <!--
-    Dinner-Swap Landing Page（中文）
-    Single-file HTML/CSS/JS — 可直接放入 GitHub 專案（例如: /index.html）
-    若要在 GitHub Pages 發佈：將此檔命名為 index.html 並推到 gh-pages 或 main 分支。
-
-    品牌價值（已提取並設計呈現）:
-      • 降低交友社交焦慮
-      • 以共享美食作為自然破冰
-      • 匿名外送，確保安全與隱私
-      • 溫暖、浪漫、帶點神秘的氛圍
-      • 現代、乾淨、極簡的 UI（參考 Apple HIG）
-
-    使用說明（在檔內註解）：
-      - 修改 Google 表單連結：搜索 #joinBtn 並替換 href
-      - 調整配色 / 動畫：修改 :root CSS 變數
-      - 若要拆成多檔案（JS/CSS），可在 GitHub 專案中分割，但保留本檔作為單檔快速預覽
-  -->
-
+  <!-- Apple HIG-like system fonts -->
   <style>
-    /* ===========================
-       可客製化 CSS 變數（調整品牌色、動畫與版面）
-       =========================== */
     :root{
-      /* 主題色（修改以符合品牌） */
-      --bg-deep: #0c0812;           /* 背景底色 */
-      --accent-1: #ff7a9a;         /* 暖粉（浪漫） */
-      --accent-2: #ffbf80;         /* 暖杏（溫暖） */
-      --accent-3: #7ad7ff;         /* 冷調對比（點綴） */
-
-      --glass-1: rgba(255,255,255,0.06);
-      --glass-2: rgba(255,255,255,0.03);
-
-      --text-strong: rgba(255,255,255,0.96);
-      --text-muted: rgba(255,255,255,0.70);
-
-      /* 動畫/效能 */
-      --gradient-cycle: 18s;       /* 背景漸層循環時間 */
-      --particle-count: 56;        /* 粒子數量（視裝置） */
-      --particle-speed: 0.36;      /* 粒子速度倍率 */
-
-      /* 版面 */
-      --radius: 16px;
-      --max-width: 1100px;
-      --card-padding: clamp(18px, 3vw, 36px);
-      --mobile-break: 880px;
+      --bg:#0f1113;            /* 深色背景來帶出神秘感（可改為 #fff 做淺色主題） */
+      --card:#0f1720;          /* 卡片底色 */
+      --muted:#9aa4ab;
+      --accent:#ff6b81;        /* 暖粉色作為浪漫點綴 */
+      --accent-2:#ffb6c1;      /* 淺粉做漸層 */
+      --glass: rgba(255,255,255,0.06);
+      --radius:16px;
+      --maxw:1100px;
     }
 
-    /* 無障礙：偏好減少動作者降低動畫強度 */
-    @media (prefers-reduced-motion: reduce) {
-      :root{ --gradient-cycle: 120s; --particle-speed: 0.05; }
-    }
-
-    /* ===========================
-       基礎樣式（Apple HIG 靈感：簡潔、空白、層次）
-       =========================== */
-    html,body{
-      height:100%;
+    /* Reset & base */
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
       margin:0;
-      background:var(--bg-deep);
-      color:var(--text-strong);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans";
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", Arial, sans-serif;
+      background:
+        radial-gradient(1200px 600px at 10% 10%, rgba(255,107,129,0.06), transparent 10%),
+        linear-gradient(180deg, rgba(15,17,19,1) 0%, rgba(10,12,14,1) 100%);
+      color: #e6eef3;
       -webkit-font-smoothing:antialiased;
       -moz-osx-font-smoothing:grayscale;
-      -webkit-text-size-adjust:none;
-    }
-
-    /* 外層舞台：滿版、置中 */
-    .stage {
-      min-height:100vh;
+      line-height:1.45;
+      padding:40px 20px;
       display:flex;
-      align-items:center;
       justify-content:center;
-      position:relative;
-      overflow:hidden;
-      padding:28px;
+      align-items:flex-start;
+      gap:24px;
     }
 
-    /* 動態模糊漸層背景（創造溫暖浪漫氛圍） */
-    .bg-gradient{
-      position:absolute;
-      inset:0;
-      z-index:0;
-      background: linear-gradient(120deg,
-        rgba(255,122,154,0.12) 0%,
-        rgba(255,191,128,0.08) 28%,
-        rgba(122,215,255,0.05) 58%,
-        rgba(170,110,200,0.06) 84%);
-      filter: blur(40px) saturate(1.05);
-      mix-blend-mode: screen;
-      animation: drift var(--gradient-cycle) linear infinite;
-      transform-origin:center;
-    }
-    @keyframes drift {
-      0% { transform: translate(-8%, -6%) scale(1.03) rotate(0deg); }
-      50% { transform: translate(10%, 6%) scale(1.07) rotate(1.8deg); }
-      100%{ transform: translate(-8%, -6%) scale(1.03) rotate(0deg); }
+    /* Container */
+    .wrap{
+      width:100%;
+      max-width:var(--maxw);
+      margin:0 auto;
     }
 
-    /* 粒子畫布（輕量） */
-    canvas.bg-particles{
-      position:absolute;
-      inset:0;
-      z-index:0;
-      pointer-events:none;
-      opacity:0.9;
-      mix-blend-mode: screen;
-    }
-
-    /* 主要內容卡片（Glassmorphism） */
-    .card {
-      position:relative;
-      z-index:2;
-      width:min(100%, var(--max-width));
+    header.hero{
       display:grid;
       grid-template-columns: 1fr 420px;
-      gap:28px;
-      padding: var(--card-padding);
-      border-radius: calc(var(--radius) + 6px);
-      background: linear-gradient(180deg, var(--glass-1), var(--glass-2));
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.04);
-      box-shadow: 0 18px 48px rgba(2,6,20,0.62);
-      box-sizing:border-box;
-      align-items: start;
-    }
-
-    /* 左側：品牌、標題、CTA */
-    .hero {
-      display:flex;
-      flex-direction:column;
-      gap:14px;
-    }
-    .brand {
-      display:flex;
-      gap:12px;
+      gap:32px;
       align-items:center;
+      margin-bottom:36px;
     }
-    .logo{
-      width:56px;
-      height:56px;
-      border-radius:12px;
-      background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:white;
-      font-weight:700;
-      font-size:18px;
-      box-shadow: 0 8px 26px rgba(0,0,0,0.28), inset 0 -6px 12px rgba(255,255,255,0.06);
+
+    /* Responsive stack */
+    @media (max-width:900px){
+      header.hero{grid-template-columns:1fr; text-align:center;}
+      .visual{order: -1}
     }
-    .brand h1{ margin:0; font-size:18px; letter-spacing:0.2px; }
-    .brand p{ margin:0; color:var(--text-muted); font-size:13px; }
 
-    .title{ margin:0; font-size: clamp(20px, 4.2vw, 36px); line-height:1.02; font-weight:700; }
-    .lead{ margin:0; color:var(--text-muted); font-size:15px; max-width:60ch; line-height:1.5; }
+    .left{
+      padding:28px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius: var(--radius);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+      backdrop-filter: blur(6px) saturate(120%);
+    }
 
-    .controls{ margin-top:8px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
-    .btn-primary{
-      appearance:none;
+    .kicker{
       display:inline-flex;
       align-items:center;
       gap:10px;
-      padding:12px 20px;
-      border-radius:14px;
-      border:none;
-      cursor:pointer;
-      text-decoration:none;
-      color:white;
-      font-weight:700;
+      color:var(--accent);
+      font-weight:600;
+      letter-spacing:0.6px;
+      margin-bottom:10px;
+    }
+
+    h1{
+      margin:0 0 14px 0;
+      font-size:clamp(22px,3.2vw,36px);
+      line-height:1.04;
+      letter-spacing:-0.02em;
+    }
+
+    p.lead{
+      margin:0 0 22px 0;
+      color:var(--muted);
       font-size:15px;
-      background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
-      box-shadow: 0 10px 34px rgba(255,122,154,0.16);
     }
-    .btn-primary:focus{ outline:3px solid rgba(255,122,154,0.14); outline-offset:3px; }
 
-    .privacy { color:var(--text-muted); font-size:13px; }
-
-    /* 右側：四步驟區塊 */
-    .panel{ display:flex; flex-direction:column; gap:12px; align-items:stretch; }
-    .panel h3{ margin:0; font-size:15px; color:var(--text-muted); }
-    .panel p.meta{ margin:6px 0 0 0; color:var(--text-muted); font-size:13px; }
-
-    .steps{
-      margin-top:8px;
-      display:grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap:12px;
-    }
-    .step{
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius:12px;
-      padding:14px;
+    /* Primary CTA */
+    .actions{
       display:flex;
       gap:12px;
-      align-items:flex-start;
-      border:1px solid rgba(255,255,255,0.03);
-      min-height:88px;
-      transition: transform .22s cubic-bezier(.2,.9,.25,1), box-shadow .22s;
-      cursor:default;
+      align-items:center;
+      flex-wrap:wrap;
     }
-    .step:hover{ transform: translateY(-6px); box-shadow: 0 18px 44px rgba(2,6,20,0.48); }
 
-    .num{
-      width:56px;
-      height:56px;
+    .btn{
+      appearance:none;
+      border:0;
+      padding:12px 18px;
       border-radius:12px;
+      font-weight:600;
+      cursor:pointer;
+      background: linear-gradient(90deg,var(--accent),var(--accent-2));
+      color:#111;
+      box-shadow: 0 6px 18px rgba(255,107,129,0.16);
+      transition: transform .14s ease, box-shadow .14s ease;
+    }
+    .btn:active{ transform: translateY(1px) scale(.998) }
+    .btn.ghost{
+      background:transparent;
+      color:var(--muted);
+      box-shadow:none;
+      border:1px solid rgba(255,255,255,0.04);
+    }
+
+    /* Four-step process */
+    .steps{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:14px;
+      margin-top:22px;
+    }
+    @media (max-width:900px){
+      .steps{ grid-template-columns: repeat(2,1fr) }
+    }
+    @media (max-width:520px){
+      .steps{ grid-template-columns: 1fr; }
+    }
+
+    .step{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      padding:14px;
+      border-radius:14px;
+      display:flex;
+      gap:12px;
+      align-items:center;
+      transition: transform .18s ease, box-shadow .18s ease;
+      border: 1px solid rgba(255,255,255,0.02);
+    }
+    .step:hover{ transform: translateY(-6px); box-shadow: 0 12px 30px rgba(0,0,0,0.6) }
+
+    .icon{
+      min-width:54px;
+      height:54px;
+      border-radius:12px;
+      background: linear-gradient(135deg, rgba(255,107,129,0.12), rgba(255,182,193,0.06));
       display:flex;
       align-items:center;
       justify-content:center;
       font-weight:700;
-      font-size:18px;
-      color:white;
-      box-shadow: inset 0 -6px 12px rgba(0,0,0,0.12);
+      color:var(--accent);
+      font-size:22px;
+      border:1px solid rgba(255,255,255,0.03);
       flex-shrink:0;
     }
-    .num.s1{ background: linear-gradient(135deg,var(--accent-3), rgba(122,215,255,0.9)); }
-    .num.s2{ background: linear-gradient(135deg,var(--accent-1), rgba(255,122,154,0.95)); }
-    .num.s3{ background: linear-gradient(135deg,var(--accent-2), rgba(255,190,122,0.95)); }
-    .num.s4{ background: linear-gradient(135deg,var(--accent-1), var(--accent-2)); }
+    .step h4{ margin:0; font-size:15px }
+    .step p{ margin:2px 0 0 0; color:var(--muted); font-size:13px }
 
-    .step h4{ margin:0; font-size:15px; color:var(--text-strong); }
-    .step p{ margin:6px 0 0 0; color:var(--text-muted); font-size:13px; line-height:1.35; }
-
-    .reveal-dot{ width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,0.12); margin-left:auto; margin-top:6px; transition: transform .24s, background .24s; }
-    .step.revealed .reveal-dot { background: linear-gradient(90deg,var(--accent-1),var(--accent-2)); transform: scale(1.25); }
-
-    /* footer note (card 下方) */
-    .card-note{ margin-top:12px; color:var(--text-muted); font-size:12px; }
-
-    /* RWD */
-    @media (max-width: calc(var(--mobile-break) * 1px)) {
-      .card { grid-template-columns: 1fr; }
-      .bg-illustration { display:none; }
+    /* Right visual: stylized plate + floating hearts/food */
+    .visual{
+      padding:24px;
+      border-radius:var(--radius);
+      position:relative;
+      min-height:320px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:visible;
     }
-    @media (max-width:560px){
-      .steps{ grid-template-columns: 1fr; }
-      .title{ font-size:20px; }
-      .brand h1{ font-size:16px; }
+
+    /* Plate illustration */
+    .plate{
+      width:320px;
+      height:320px;
+      border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.03), rgba(255,255,255,0.01) 40%);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow: inset 0 -10px 30px rgba(0,0,0,0.6), 0 10px 30px rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.03);
+    }
+    .plate svg{ width:72%; height:72% }
+
+    /* Floating hearts / food icons (animation) */
+    .float{
+      position:absolute;
+      pointer-events:none;
+      opacity:.95;
+      filter: drop-shadow(0 6px 18px rgba(0,0,0,0.6));
+      animation: floaty 6s ease-in-out infinite;
+      transform-origin:center;
+    }
+    .float--one{ right:6%; top:6%; animation-delay:0s; transform: translateY(0) }
+    .float--two{ left:8%; bottom:10%; animation-delay:1.2s; transform: translateY(0) }
+    .float--three{ left:20%; top:4%; animation-delay:2.1s }
+    @keyframes floaty{
+      0%{ transform: translateY(0) rotate(0deg) }
+      50%{ transform: translateY(-18px) rotate(6deg) }
+      100%{ transform: translateY(0) rotate(0deg) }
+    }
+
+    /* Footer / notes */
+    footer{
+      margin-top:28px;
+      color:var(--muted);
+      font-size:13px;
+      text-align:center;
+    }
+
+    /* Small utility */
+    .pill {
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      background: rgba(255,255,255,0.02);
+      color:var(--muted);
+      font-size:13px;
+      border:1px solid rgba(255,255,255,0.02);
     }
   </style>
 </head>
 <body>
-  <main class="stage" role="main" aria-labelledby="hero-title">
-    <!-- 動態漸層 & 粒子（無外部資源） -->
-    <div class="bg-gradient" aria-hidden="true"></div>
-    <canvas class="bg-particles" id="bgParticles" aria-hidden="true"></canvas>
+  <main class="wrap" role="main">
+    <header class="hero" aria-label="Dinner Swap 介紹區">
+      <section class="left" aria-labelledby="hero-title">
+        <div class="kicker" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="transform:translateY(1px)">
+            <path d="M12 21s-7-4.5-7-10a7 7 0 0 1 14 0c0 5.5-7 10-7 10z" fill="#ff6b81"></path>
+          </svg>
+          <span>Dinner-Swap</span>
+        </div>
 
-    <!-- 可替換的裝飾插畫（若要換圖，請改成 inline SVG 或 data URI） -->
-    <svg class="bg-illustration" viewBox="0 0 360 360" style="position:absolute; right:6%; top:6%; width:320px; z-index:1; pointer-events:none; opacity:0.95; filter:drop-shadow(0 12px 30px rgba(0,0,0,0.45));" aria-hidden="true">
-      <defs>
-        <linearGradient id="lg1" x1="0" x2="1"><stop offset="0" stop-color="#ff7a9a"/><stop offset="1" stop-color="#ffbf80"/></linearGradient>
-        <linearGradient id="lg2" x1="0" x2="1"><stop offset="0" stop-color="#7ad7ff"/><stop offset="1" stop-color="#c4a3ff"/></linearGradient>
-      </defs>
-      <rect x="0" y="0" width="360" height="360" rx="28" fill="url(#lg2)" opacity="0.06"></rect>
-      <g transform="translate(30,40)">
-        <ellipse cx="150" cy="210" rx="120" ry="40" fill="rgba(0,0,0,0.16)"></ellipse>
-        <circle cx="150" cy="120" r="52" fill="url(#lg1)"></circle>
-        <path d="M134 100c4-6 24-6 32 0" stroke="#fff" stroke-opacity="0.15" stroke-width="6" stroke-linecap="round" fill="none"/>
-      </g>
-    </svg>
+        <h1 id="hero-title">不再尬聊，用一份晚餐，開啟真誠的對話</h1>
 
-    <!-- 主要卡片 -->
-    <section class="card" aria-labelledby="hero-title">
-      <!-- 左：品牌與說明 -->
-      <div class="hero">
-        <div class="brand" aria-hidden="false">
-          <div class="logo" aria-hidden="true">DS</div>
-          <div>
-            <h1 id="hero-title">Dinner-Swap</h1>
-            <p>以餐點為媒，溫柔創造邂逅</p>
+        <p class="lead">
+          為害怕寒暄的人打造的溫柔約會流程 — 配對 → 選餐 → 我們幫你下單 → 評分解鎖並揭開連結。
+          我們以美食做為自然破冰，並採用地址遮罩與預付託管來保障隱私與安全。
+        </p>
+
+        <div class="actions" role="group" aria-label="主要操作">
+          <!-- Primary CTA: 開啟 Google Form（請替換成你的 Form 連結） -->
+          <button class="btn" id="joinBtn" aria-haspopup="true" aria-controls="earlyAccessForm" onclick="openForm()">
+            加入早鳥體驗（Join Early Access）
+          </button>
+
+          <button class="btn ghost" onclick="scrollToSteps()" aria-label="了解四步流程">
+            了解流程
+          </button>
+        </div>
+
+        <!-- 四步流程（簡潔） -->
+        <div class="steps" id="steps" aria-hidden="false" style="margin-top:20px">
+          <div class="step" aria-label="配對">
+            <div class="icon">1</div>
+            <div>
+              <h4>配對</h4>
+              <p>系統依喜好與飲食偏好智能配對。</p>
+            </div>
+          </div>
+
+          <div class="step" aria-label="選餐">
+            <div class="icon">2</div>
+            <div>
+              <h4>選餐</h4>
+              <p>各自挑選想送給對方的餐點，附上暖心小卡。</p>
+            </div>
+          </div>
+
+          <div class="step" aria-label="我們下單">
+            <div class="icon">3</div>
+            <div>
+              <h4>我們幫你下單</h4>
+              <p>平台代為下單並使用地址遮罩與預付託管機制。</p>
+            </div>
+          </div>
+
+          <div class="step" aria-label="揭開面紗">
+            <div class="icon">4</div>
+            <div>
+              <h4>揭開面紗</h4>
+              <p>收餐後評分並解鎖聊天，讓對話自然延伸。</p>
+            </div>
           </div>
         </div>
 
-        <h2 class="title">降低交友焦慮，讓美食替你破冰</h2>
-        <p class="lead">
-          我們以共享餐點作為自然的破冰方式，利用匿名外送保護隱私，營造溫暖、浪漫且帶點神秘的氛圍 — 讓你在舒適安全的節奏中認識對方。
-        </p>
+        <footer>
+          <div class="pill">溫馨提醒：我們重視隱私與餐食安全，將採地址遮罩與實名/信用機制。</div>
+        </footer>
+      </section>
 
-        <div class="controls" role="group" aria-label="主要動作">
-          <!-- 請將 href 替換為真實的 Google 表單連結（目前為佔位符） -->
-          <a id="joinBtn" class="btn-primary" href="https://docs.google.com/forms/d/PLACEHOLDER" target="_blank" rel="noopener noreferrer" aria-label="加入搶先體驗（在新分頁開啟 Google 表單）">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M12 2v20M2 12h20" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            加入搶先體驗
-          </a>
-          <div class="privacy">匿名外送 • 隱私優先</div>
+      <!-- 右側視覺區 -->
+      <aside class="visual" aria-hidden="false">
+        <div class="plate" role="img" aria-label="象徵用餐與心動的盤子">
+          <!-- Inline SVG illustration：盤中心形餐點（可替換成 logo 圖檔） -->
+          <svg viewBox="0 0 200 200" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="g1" x1="0" x2="1">
+                <stop offset="0" stop-color="#ff7a8a"/>
+                <stop offset="1" stop-color="#ffb6c1"/>
+              </linearGradient>
+              <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000" flood-opacity="0.45"/>
+              </filter>
+            </defs>
+            <g filter="url(#shadow)">
+              <circle cx="100" cy="100" r="80" fill="url(#g1)" opacity="0.08"/>
+              <g transform="translate(60,50)">
+                <path d="M40 10 C 50 -10, 90 -10, 100 10 C 110 -10, 150 -10, 160 10 C 170 30, 120 52, 100 72 C 80 52, 30 30, 40 10 Z" fill="url(#g1)"/>
+                <circle cx="100" cy="52" r="6" fill="#fff" opacity="0.9"/>
+              </g>
+            </g>
+          </svg>
         </div>
 
-        <div class="card-note" aria-hidden="true">
-          <small>我們只在雙方同意時揭露身分 — 尊重節奏，降低壓力。</small>
+        <!-- 動態浮動裝飾：小心形 / 食物圖示（純裝飾） -->
+        <svg class="float float--one" width="72" height="72" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 21s-7-4.5-7-10a7 7 0 0 1 14 0c0 5.5-7 10-7 10z" fill="#ff6b81"/>
+        </svg>
+
+        <svg class="float float--two" width="62" height="62" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 2c2.8 0 5 2.2 5 5 0 4-5 9-5 9s-5-5-5-9c0-2.8 2.2-5 5-5z" fill="#ffd1dc"/>
+        </svg>
+
+        <svg class="float float--three" width="56" height="56" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" fill="#ff8fa3" opacity="0.14"/>
+        </svg>
+      </aside>
+    </header>
+
+    <!-- 額外區塊：信任 / FAQ（可擴充） -->
+    <section aria-labelledby="trust-title" style="margin-bottom:28px">
+      <h2 id="trust-title" style="font-size:18px;margin:0 0 12px 0">我們如何保障你的安心</h2>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+        <div style="background:var(--glass);padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.02)">
+          <strong>地址遮罩</strong>
+          <p style="margin:8px 0 0;color:var(--muted);font-size:13px">配送員只看到代碼化地址；對方看不到你的住址。</p>
+        </div>
+        <div style="background:var(--glass);padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.02)">
+          <strong>預付託管</strong>
+          <p style="margin:8px 0 0;color:var(--muted);font-size:13px">雙方訂單皆成立才撥款，避免爽約與浪費。</p>
+        </div>
+        <div style="background:var(--glass);padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.02)">
+          <strong>評分解鎖</strong>
+          <p style="margin:8px 0 0;color:var(--muted);font-size:13px">收餐後評分作為破冰，只有合格評分後才能聊天。</p>
         </div>
       </div>
-
-      <!-- 右：四步驟 -->
-      <aside class="panel" aria-label="運作流程">
-        <div>
-          <h3>運作流程</h3>
-          <p class="meta">四個柔和步驟，從配對到揭露 — 以食物為橋，讓相遇更自然。</p>
-        </div>
-
-        <div class="steps" role="list">
-          <!-- Step 1 -->
-          <article class="step" role="listitem" tabindex="0" aria-labelledby="step1-title">
-            <div class="num s1" aria-hidden="true">1</div>
-            <div>
-              <h4 id="step1-title">配對 • Match</h4>
-              <p>根據餐飲喜好與行為建議配對，避免直接尷尬的首次介紹。</p>
-            </div>
-          </article>
-
-          <!-- Step 2 -->
-          <article class="step" role="listitem" tabindex="0" aria-labelledby="step2-title">
-            <div class="num s2" aria-hidden="true">2</div>
-            <div>
-              <h4 id="step2-title">互選餐點 • Choose Meals</h4>
-              <p>你與對方各自選擇喜歡的餐點，讓餐點成為自然的話題與共同點。</p>
-            </div>
-          </article>
-
-          <!-- Step 3 -->
-          <article class="step" role="listitem" tabindex="0" aria-labelledby="step3-title">
-            <div class="num s3" aria-hidden="true">3</div>
-            <div>
-              <h4 id="step3-title">我們代下單 • We Place the Orders</h4>
-              <p>平台協助下單並以匿名方式送達，降低首次接觸的壓力與風險。</p>
-            </div>
-          </article>
-
-          <!-- Step 4 -->
-          <article id="reveal" class="step" role="listitem" tabindex="0" aria-labelledby="step4-title" aria-pressed="false">
-            <div class="num s4" aria-hidden="true">4</div>
-            <div>
-              <h4 id="step4-title">揭開連結 • Reveal the Connection</h4>
-              <p>當雙方都覺得自在時，可選擇揭露身分或保持匿名，由你決定下一步。</p>
-            </div>
-            <div class="reveal-dot" id="revealDot" title="揭露狀態提示"></div>
-          </article>
-        </div>
-
-        <div style="margin-top:8px; color:var(--text-muted); font-size:13px;">以食物為先、以隱私為本，讓連結更溫柔自然。</div>
-      </aside>
     </section>
+
+    <!-- 底部簡短註記 -->
+    <section style="margin-top:12px">
+      <p style="color:var(--muted);font-size:13px">
+        本頁為 Dinner-Swap 概念 Landing Page 原型 — 設計重點：降低社交焦慮、以美食破冰、保障隱私（地址遮罩/託管）、營造溫暖浪漫的儀式感。
+      </p>
+    </section>
+
   </main>
 
   <script>
-    /* =======================================================
-       Particles 背景（輕量且無外部依賴）
-       可透過 :root 的 --particle-count 與 --particle-speed 調整
-       ======================================================= */
-    (function(){
-      const canvas = document.getElementById('bgParticles');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      let DPR = Math.max(1, window.devicePixelRatio || 1);
+    /* ========= 互動腳本（簡潔） =========
+       - openForm() : 打開 Google Form（請替換 formUrl）
+       - scrollToSteps(): 捲動到流程區塊
+       註：若要在 GitHub 上做版本控制，可把此 script 提取到 script.js。
+    ===================================== */
 
-      const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-      const COUNT = Math.max(6, parseInt(css('--particle-count')) || 56);
-      const SPEED = Math.max(0.05, parseFloat(css('--particle-speed')) || 0.36);
-      const colors = [ css('--accent-1') || '#ff7a9a', css('--accent-2') || '#ffbf80', css('--accent-3') || '#7ad7ff' ];
+    const formUrl = 'https://forms.gle/your-placeholder-link'; // <-- 替換成你的 Google Form 連結
 
-      function resize(){
-        DPR = Math.max(1, window.devicePixelRatio || 1);
-        canvas.width = Math.ceil(window.innerWidth * DPR);
-        canvas.height = Math.ceil(window.innerHeight * DPR);
-        canvas.style.width = window.innerWidth + 'px';
-        canvas.style.height = window.innerHeight + 'px';
-        ctx.setTransform(DPR,0,0,DPR,0,0);
-      }
-      window.addEventListener('resize', resize, { passive:true });
-      resize();
+    function openForm(){
+      // 使用新分頁打開（不阻塞）
+      window.open(formUrl, '_blank', 'noopener,noreferrer');
+      // 你可以在這裡加入 event tracking (GA / FB pixel) 的呼叫
+    }
 
-      const particles = [];
-      function rand(a,b){ return Math.random()*(b-a)+a; }
-      for (let i=0;i<COUNT;i++){
-        particles.push({
-          x: rand(0, canvas.width/DPR),
-          y: rand(0, canvas.height/DPR),
-          r: rand(0.6, 3.6),
-          vx: rand(-0.22, 0.22) * SPEED,
-          vy: rand(-0.08, 0.08) * SPEED,
-          c: colors[Math.floor(Math.random()*colors.length)],
-          a: rand(0.06, 0.45)
-        });
-      }
+    function scrollToSteps(){
+      const el = document.getElementById('steps');
+      if(!el) return;
+      el.scrollIntoView({behavior:'smooth', block:'center'});
+    }
 
-      let last = performance.now();
-      function loop(now){
-        const dt = Math.min(40, now - last) / 16.666;
-        last = now;
-        ctx.clearRect(0,0,canvas.width, canvas.height);
+    // Accessibility: enter 鍵也可以觸發加入按鈕
+    document.getElementById('joinBtn').addEventListener('keyup', (e)=>{
+      if(e.key === 'Enter') openForm();
+    });
 
-        for (const p of particles){
-          p.x += p.vx * dt * (1 + Math.sin(now/6000)*0.6);
-          p.y += p.vy * dt * (1 + Math.cos(now/5000)*0.4) + (p.r * 0.02);
-          if (p.x < -10) p.x = canvas.width/DPR + 10;
-          if (p.x > canvas.width/DPR + 10) p.x = -10;
-          if (p.y < -10) p.y = canvas.height/DPR + 10;
-          if (p.y > canvas.height/DPR + 10) p.y = -10;
-
-          ctx.beginPath();
-          ctx.fillStyle = p.c;
-          ctx.globalAlpha = p.a;
-          ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-          ctx.fill();
-        }
-        ctx.globalAlpha = 1;
-        requestAnimationFrame(loop);
-      }
-
-      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) requestAnimationFrame(loop);
-      else {
-        // 如果偏好減少動作，畫一張靜態的點綴圖
-        for (const p of particles){
-          ctx.beginPath();
-          ctx.fillStyle = p.c;
-          ctx.globalAlpha = p.a;
-          ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-          ctx.fill();
-        }
-        ctx.globalAlpha = 1;
+    // 可加入簡單 A/B test（範例）：根據 query param ?variant=b 展示不同配色
+    (function applyVariant(){
+      const url = new URL(window.location.href);
+      const v = url.searchParams.get('variant');
+      if(v === 'b'){
+        document.documentElement.style.setProperty('--accent','#6be0ff');
+        document.documentElement.style.setProperty('--accent-2','#8feaff');
       }
     })();
-
-    /* =======================================================
-       Reveal（示範互動）
-       - 點擊或按鍵切換 .revealed 樣式（實際產品應由後端授權流程控制）
-       ======================================================= */
-    (function(){
-      const reveal = document.getElementById('reveal');
-      const dot = document.getElementById('revealDot');
-      if (!reveal || !dot) return;
-      let state = false;
-      function setState(v){
-        state = !!v;
-        if (state){
-          reveal.classList.add('revealed');
-          reveal.setAttribute('aria-pressed','true');
-          dot.setAttribute('title','已揭露');
-        } else {
-          reveal.classList.remove('revealed');
-          reveal.setAttribute('aria-pressed','false');
-          dot.setAttribute('title','揭露狀態');
-        }
-      }
-      reveal.addEventListener('click', ()=> setState(!state));
-      reveal.addEventListener('keydown', (e)=>{
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setState(!state); }
-      });
-      setState(false);
-    })();
-
-    /* =======================================================
-       Join 按鈕微互動（短暫縮放回饋）
-       ======================================================= */
-    (function(){
-      const btn = document.getElementById('joinBtn');
-      if (!btn) return;
-      btn.addEventListener('click', ()=> {
-        btn.style.transition = 'transform .12s ease';
-        btn.style.transform = 'scale(.985)';
-        setTimeout(()=> btn.style.transform = '', 120);
-      });
-    })();
-
-    /* =======================================================
-       開發/上線備註（請保留於專案 README）
-       - 此檔為單一檔案快速上線範本：放入 GitHub repo 根目錄，命名 index.html
-       - 若拆分為多檔：
-         /index.html
-         /assets/styles.css
-         /assets/main.js
-         /assets/img/*.svg
-       - 請勿在公開 repo 中放置真實使用者資料或敏感憑證
-       ======================================================= */
   </script>
+
+  <!--
+    註解：如何自訂
+    1) 替換 Google Form：修改上方 script 裡的 formUrl。
+    2) Logo / 圖片：把 logo 放到 assets/logo.png，並在右側 .plate 內用 <img> 替換 SVG。
+    3) 若要淺色主題：把 :root 裡 --bg、--card、text color 改回淺色調，並微調陰影。
+    4) 若要拆分檔案：把 <style> 複製到 styles.css，<script> 複製到 script.js，並在 HTML head / body 引入。
+  -->
+
 </body>
 </html>
-
