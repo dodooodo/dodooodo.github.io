@@ -1,672 +1,466 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dinner-Swap — Early Access</title>
+  <title>Dinner-Swap 搶先體驗</title>
 
   <!--
-    Dinner-Swap Landing Page
-    - Single-file HTML/CSS/JS (no external deps)
-    - Brand values implemented: reduce social anxiety, food as icebreaker,
-      anonymized delivery feel, warm romantic + slightly mysterious atmosphere,
-      Apple-like modern minimalist aesthetic.
-    - Customize colors / speeds / copy via CSS variables below.
-    -->
+    Dinner-Swap 單頁 Landing Page（中文）
+    - 單一檔案：HTML / CSS / JS，無外部資源
+    - 品牌價值實作：
+        • 降低交友社交焦慮
+        • 以共享美食當破冰
+        • 匿名外送保障隱私
+        • 溫暖、浪漫、帶點神秘
+        • 符合 Apple HIG 的極簡樣式
+    - 可自訂項目：請修改 :root CSS 變數（色彩、動態速度、粒子數等）
+    - 將 Google 表單連結放入 id="joinBtn" 的 href 屬性（目前為佔位符）
+  -->
 
   <style>
     /* ===========================
-       CUSTOMIZATION VARIABLES
-       Change these to tweak brand styling / animation
+       customization variables（可調）
        =========================== */
     :root{
-      /* Brand color palette (modify to suit your brand) */
-      --bg-deep: #0f0b1a;           /* deep background base */
-      --accent-1: #ff7a9a;         /* warm pink (romantic) */
-      --accent-2: #ffbe7a;         /* warm apricot */
-      --accent-3: #7ad7ff;         /* cool contrast */
-      --glass: rgba(255,255,255,0.06); /* subtle glass panel */
-      --glass-2: rgba(255,255,255,0.03);
-      --text-strong: rgba(255,255,255,0.95);
+      --bg: #0d0b12;                /* 背景深色 */
+      --glass: rgba(255,255,255,0.04);
+      --glass-2: rgba(255,255,255,0.02);
+      --accent-warm: #ff7a9a;      /* 暖粉 */
+      --accent-soft: #ffb87a;      /* 暖橙 */
+      --accent-cool: #7ad7ff;      /* 冷調對比 */
+      --text-primary: rgba(255,255,255,0.96);
       --text-muted: rgba(255,255,255,0.68);
 
-      /* Motion / particle tuning */
-      --gradient-speed: 18s;        /* background gradient animation duration */
-      --particle-count: 60;         /* number of canvas particles */
-      --particle-speed-mult: 0.4;   /* particle speed multiplier */
-      --step-card-hover-scale: 1.03;
-      --radius: 16px;               /* card corner radius (Apple-like) */
-
-      /* Layout */
+      --radius: 16px;
       --max-width: 1100px;
-      --gutter: 20px;
-      --glass-blur: 10px;
-      --content-padding: 32px;
-      --mobile-break: 820px;
+
+      --gradient-speed: 18s;
+      --particle-count: 56;
+      --particle-speed: 0.35;
     }
 
-    /* Accessibility: respect user preference for reduced motion */
-    @media (prefers-reduced-motion: reduce) {
-      :root{
-        --gradient-speed: 120s;
-      }
+    /* Respect user reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      :root{ --gradient-speed: 120s; --particle-speed: 0.05; }
     }
 
     /* ===========================
-       Base / Apple-like Typography
+       Base & typography (Apple HIG style)
        =========================== */
     html,body{
       height:100%;
-      background:var(--bg-deep);
       margin:0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
-                   "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      background:var(--bg);
+      color:var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans";
       -webkit-font-smoothing:antialiased;
       -moz-osx-font-smoothing:grayscale;
-      color:var(--text-strong);
     }
 
-    /* full-bleed container for animated gradient & particles */
-    .site {
+    .stage{
       min-height:100vh;
       display:flex;
       align-items:center;
       justify-content:center;
+      padding:28px;
       position:relative;
       overflow:hidden;
     }
 
     /* animated gradient layer */
-    .bg-gradient {
-      position:absolute;
-      inset:0;
-      z-index:0;
+    .gradient {
+      position:absolute; inset:0; z-index:0;
       background: linear-gradient(120deg,
         rgba(255,122,154,0.12) 0%,
-        rgba(255,190,122,0.10) 25%,
-        rgba(122,215,255,0.06) 55%,
-        rgba(140,90,200,0.08) 80%,
-        rgba(255,122,154,0.12) 100%);
+        rgba(255,184,122,0.08) 30%,
+        rgba(122,215,255,0.05) 60%,
+        rgba(180,110,210,0.06) 90%);
       filter: blur(40px) saturate(1.05);
-      transform: translateZ(0);
-      animation: slideGradient var(--gradient-speed) linear infinite;
       mix-blend-mode: screen;
+      animation: shift var(--gradient-speed) linear infinite;
+      transform-origin:center;
     }
-    @keyframes slideGradient {
-      0% { transform: translateX(-10%) translateY(-5%) scale(1.05) rotate(0deg); }
-      50% { transform: translateX(10%) translateY(5%) scale(1.08) rotate(2deg); }
-      100% { transform: translateX(-10%) translateY(-5%) scale(1.05) rotate(0deg); }
+    @keyframes shift {
+      0%   { transform: translate(-6%, -4%) scale(1.03) rotate(0deg); }
+      50%  { transform: translate(8%, 6%) scale(1.07) rotate(1.6deg); }
+      100% { transform: translate(-6%, -4%) scale(1.03) rotate(0deg); }
     }
 
-    /* particle canvas sits above gradient but behind content */
-    canvas.bg-particles{
+    /* soft decorative SVG image (front) */
+    .hero-illustration {
       position:absolute;
-      inset:0;
-      z-index:0;
+      right:6%;
+      top:6%;
+      width:320px;
+      max-width:28%;
+      opacity:0.95;
+      z-index:1;
       pointer-events:none;
-      opacity:0.85;
-      mix-blend-mode: screen;
+      filter: drop-shadow(0 12px 30px rgba(0,0,0,0.55));
     }
 
-    /* content card (glass-like) */
+    /* particle canvas */
+    canvas.particles {
+      position:absolute; inset:0; z-index:0; pointer-events:none; opacity:0.9; mix-blend-mode: screen;
+    }
+
+    /* main card */
     .card {
-      width: min(100%, var(--max-width));
-      margin: 48px;
       position:relative;
       z-index:2;
-      display:flex;
-      gap:32px;
-      align-items:stretch;
-      justify-content:space-between;
-      padding: clamp(18px, 3vw, 36px);
-      box-sizing:border-box;
+      width:min(100%,var(--max-width));
+      display:grid;
+      grid-template-columns: 1fr 420px;
+      gap:28px;
+      padding: clamp(20px, 3.2vw, 36px);
       border-radius: calc(var(--radius) + 6px);
       background: linear-gradient(180deg, var(--glass), var(--glass-2));
-      backdrop-filter: blur(var(--glass-blur));
-      -webkit-backdrop-filter: blur(var(--glass-blur));
-      box-shadow: 0 10px 30px rgba(5,8,20,0.6);
-      border: 1px solid rgba(255,255,255,0.04);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border:1px solid rgba(255,255,255,0.04);
+      box-shadow: 0 18px 50px rgba(2,6,20,0.6);
+      align-items:start;
+      box-sizing:border-box;
     }
 
-    /* left column: headline / CTA */
+    /* LEFT: hero content */
     .hero {
-      flex:1 1 420px;
-      display:flex;
-      flex-direction:column;
-      gap:18px;
-      min-width:260px;
+      display:flex; flex-direction:column; gap:14px;
     }
-
     .brand {
-      display:flex;
-      gap:12px;
-      align-items:center;
+      display:flex; gap:12px; align-items:center;
     }
     .logo {
-      width:56px;
-      height:56px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
-      box-shadow: 0 6px 18px rgba(255,122,154,0.12), inset 0 -6px 14px rgba(255,255,255,0.06);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:700;
-      color:#fff;
-      font-size:20px;
-      letter-spacing:0.6px;
-    }
-    .brand h1{
-      margin:0;
+      width:56px; height:56px; border-radius:12px;
+      background: linear-gradient(135deg,var(--accent-warm),var(--accent-soft));
+      display:flex; align-items:center; justify-content:center; color:white; font-weight:700;
+      box-shadow: 0 6px 22px rgba(0,0,0,0.28), inset 0 -6px 14px rgba(255,255,255,0.06);
       font-size:18px;
-      font-weight:600;
-      color:var(--text-strong);
-      letter-spacing:0.2px;
     }
-    .tag {
-      margin:0;
-      font-size:13px;
-      color:var(--text-muted);
-      font-weight:500;
-    }
+    .brand h1{ margin:0; font-size:18px; letter-spacing:0.2px; }
+    .brand p{ margin:0; font-size:13px; color:var(--text-muted); }
 
-    .headline {
-      font-size: clamp(20px, 3.6vw, 34px);
-      line-height:1.02;
-      margin:0;
-      font-weight:700;
-      color:var(--text-strong);
-      letter-spacing:-0.4px;
-    }
-
-    .sub {
-      margin:0;
-      color:var(--text-muted);
-      font-size:15px;
-      line-height:1.5;
-      max-width:48ch;
-    }
+    .title { margin:0; font-size: clamp(20px, 4.2vw, 36px); font-weight:700; line-height:1.02; }
+    .lead { margin:0; color:var(--text-muted); font-size:15px; max-width:62ch; line-height:1.5; }
 
     /* CTA */
-    .cta {
-      margin-top:8px;
-      display:flex;
-      gap:12px;
-      align-items:center;
-      flex-wrap:wrap;
-    }
-    .primary-btn{
-      --pad-y:12px;
-      --pad-x:20px;
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding: var(--pad-y) var(--pad-x);
-      border-radius: 14px;
-      background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
-      color:white;
-      font-weight:700;
-      border: none;
-      cursor:pointer;
-      font-size:15px;
-      box-shadow: 0 8px 30px rgba(255,122,154,0.18);
-      transition: transform .18s cubic-bezier(.2,.9,.25,1), box-shadow .18s;
+    .controls { margin-top:8px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    .btn-primary {
+      display:inline-flex; align-items:center; gap:10px;
+      padding:12px 20px; border-radius:14px; border:none; cursor:pointer;
+      font-weight:700; font-size:15px; color:white;
+      background: linear-gradient(90deg,var(--accent-warm),var(--accent-soft));
+      box-shadow: 0 10px 36px rgba(255,122,154,0.16);
       text-decoration:none;
     }
-    .primary-btn:active{ transform: translateY(1px); }
-    .primary-btn:focus{ outline:3px solid rgba(255,122,154,0.18); outline-offset:3px; }
+    .btn-primary:focus { outline:3px solid rgba(255,122,154,0.18); outline-offset:3px; }
 
-    .secondary-hint{
-      color:var(--text-muted);
-      font-size:13px;
-      align-self:center;
+    .privacy-note { color:var(--text-muted); font-size:13px; }
+
+    /* RIGHT: steps */
+    .panel {
+      display:flex; flex-direction:column; gap:12px; align-items:stretch;
     }
+    .panel h3 { margin:0; font-size:15px; color:var(--text-muted); }
+    .panel p.meta { margin:6px 0 0 0; color:var(--text-muted); font-size:13px; }
 
-    /* right column: steps */
     .steps {
-      width: min(520px, 46%);
-      display:flex;
-      flex-direction:column;
-      gap:18px;
-      align-items:stretch;
-    }
-
-    .steps-grid{
+      margin-top:8px;
       display:grid;
       grid-template-columns: repeat(2, 1fr);
-      gap:14px;
+      gap:12px;
     }
 
     .step {
       background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius: var(--radius);
-      padding: 18px;
+      border-radius:12px;
+      padding:14px;
       display:flex;
       gap:12px;
       align-items:flex-start;
-      transition: transform .26s cubic-bezier(.2,.9,.25,1), box-shadow .26s;
+      border:1px solid rgba(255,255,255,0.03);
+      min-height:84px;
+      transition: transform .22s ease, box-shadow .22s ease;
       cursor:default;
-      border: 1px solid rgba(255,255,255,0.03);
-      min-height:88px;
     }
-    .step:hover{
-      transform: translateY(-6px) scale(var(--step-card-hover-scale));
-      box-shadow: 0 16px 40px rgba(2,6,23,0.5);
-    }
+    .step:hover { transform: translateY(-6px); box-shadow: 0 18px 42px rgba(2,6,20,0.5); }
 
-    .step-badge{
-      min-width:56px;
-      height:56px;
-      border-radius:12px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:700;
-      color:white;
-      font-size:18px;
-      flex-shrink:0;
+    .num {
+      width:56px; height:56px; border-radius:12px; display:flex;align-items:center;justify-content:center;
+      color:white; font-weight:700; font-size:18px;
       box-shadow: inset 0 -6px 12px rgba(0,0,0,0.12);
     }
-    .step-content h3{
-      margin:0;
-      font-size:16px;
-      color:var(--text-strong);
-    }
-    .step-content p{
-      margin:6px 0 0 0;
-      color:var(--text-muted);
-      font-size:13px;
-      line-height:1.35;
-    }
+    .s1 { background: linear-gradient(135deg,var(--accent-cool), rgba(122,215,255,0.9)); }
+    .s2 { background: linear-gradient(135deg,var(--accent-warm), rgba(255,122,154,0.95)); }
+    .s3 { background: linear-gradient(135deg,var(--accent-soft), rgba(255,190,122,0.95)); }
+    .s4 { background: linear-gradient(135deg,var(--accent-warm), var(--accent-soft)); }
 
-    /* subtle footer small text inside card */
-    .card-footer {
-      margin-top:6px;
-      font-size:12px;
-      color:var(--text-muted);
-    }
+    .step h4 { margin:0; font-size:15px; color:var(--text-primary); }
+    .step p { margin:6px 0 0 0; color:var(--text-muted); font-size:13px; line-height:1.35; }
 
-    /* Responsive adjustments */
-    @media (max-width: calc(var(--mobile-break) * 1px)) {
-      .card{
-        flex-direction:column;
-        gap:20px;
-      }
-      .steps { width:100%; }
-      .steps-grid{ grid-template-columns: 1fr; }
-    }
+    .reveal-dot { width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,0.12); margin-left:auto; margin-top:6px; transition: transform .24s, background .24s; }
+    .step.revealed .reveal-dot { background: linear-gradient(90deg,var(--accent-warm),var(--accent-soft)); transform: scale(1.25); }
 
-    /* small helper: soft divider */
-    .soft-line{
-      height:1px;
-      background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
-      border-radius:1px;
-      margin:12px 0;
-    }
+    /* footer small note */
+    .foot { margin-top:18px; text-align:center; color:var(--text-muted); font-size:12px; z-index:2; }
 
-    /* Footer outside card */
-    .page-foot{
-      margin-top:18px;
-      font-size:12px;
-      color:var(--text-muted);
-      text-align:center;
-      z-index:2;
-      position:relative;
+    /* responsive */
+    @media (max-width: 940px){
+      .card { grid-template-columns: 1fr; }
+      .hero-illustration { display:none; }
     }
-
-    /* tiny micro-animation for the badges */
-    .badge-anim { animation: floatBadge 6s ease-in-out infinite; }
-    @keyframes floatBadge {
-      0%{ transform: translateY(0); }
-      50%{ transform: translateY(-6px); }
-      100%{ transform: translateY(0); }
+    @media (max-width:560px){
+      .steps { grid-template-columns: 1fr; }
+      .brand h1 { font-size:16px; }
+      .title { font-size:20px; }
     }
-
-    /* small reveal animation for 'Reveal the Connection' step */
-    .reveal-dot {
-      width:10px;
-      height:10px;
-      border-radius:50%;
-      background:rgba(255,255,255,0.12);
-      margin-left:auto;
-      margin-top:6px;
-      box-shadow: 0 6px 18px rgba(255,122,154,0.06);
-      transition: background .26s, transform .26s;
-    }
-    .step.revealed .reveal-dot {
-      background: linear-gradient(90deg,var(--accent-1),var(--accent-2));
-      transform: scale(1.25);
-    }
-
-    /* Utility */
-    .muted { color:var(--text-muted); }
-    a { color:inherit; text-decoration:none; }
-
   </style>
 </head>
 <body>
-  <main class="site" role="main" aria-labelledby="main-title">
-    <!-- animated gradient layer -->
-    <div class="bg-gradient" aria-hidden="true"></div>
+  <div class="stage" role="main" aria-labelledby="pageTitle">
+    <!-- 動態漸層與粒子 -->
+    <div class="gradient" aria-hidden="true"></div>
+    <canvas class="particles" id="particles" aria-hidden="true"></canvas>
 
-    <!-- particles canvas (JS draws here) -->
-    <canvas class="bg-particles" id="bgParticles" aria-hidden="true"></canvas>
+    <!-- 插畫（可自訂或替換為 inline SVG） -->
+    <svg class="hero-illustration" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <!-- gentle plate + heart + steam illustration -->
+      <defs>
+        <linearGradient id="g1" x1="0" x2="1">
+          <stop offset="0" stop-color="#ff7a9a"/>
+          <stop offset="1" stop-color="#ffb87a"/>
+        </linearGradient>
+        <linearGradient id="g2" x1="0" x2="1">
+          <stop offset="0" stop-color="#7ad7ff"/>
+          <stop offset="1" stop-color="#c9a0ff"/>
+        </linearGradient>
+      </defs>
+      <rect width="100%" height="100%" rx="24" fill="url(#g2)" opacity="0.06"/>
+      <g transform="translate(40,40)">
+        <ellipse cx="160" cy="220" rx="120" ry="40" fill="rgba(0,0,0,0.18)"/>
+        <ellipse cx="160" cy="190" rx="110" ry="34" fill="#fff" opacity="0.06"/>
+        <g transform="translate(60,30)">
+          <circle cx="120" cy="80" r="52" fill="url(#g1)" opacity="0.95"/>
+          <path d="M100 60c8-12 36-12 44 0" fill="none" stroke="#fff" stroke-opacity="0.18" stroke-width="8" stroke-linecap="round"/>
+          <path d="M116 44c2-6 12-6 14 0" fill="none" stroke="#fff" stroke-opacity="0.12" stroke-width="6" stroke-linecap="round"/>
+          <!-- small heart -->
+          <path d="M132 74c0 6-8 12-12 16-4-4-12-10-12-16 0-6 5-10 10-10 3 0 5 2 6 3 1-1 3-3 6-3 5 0 10 4 10 10z" fill="#fff" opacity="0.9"/>
+        </g>
+        <!-- steam: subtle curves -->
+        <g fill="none" stroke="#fff" stroke-opacity="0.06" stroke-width="8" stroke-linecap="round">
+          <path d="M64 22c8 10-6 34 20 44" />
+          <path d="M92 6c6 14-8 36 14 50" />
+        </g>
+      </g>
+    </svg>
 
-    <!-- content card -->
-    <section class="card" aria-label="Dinner Swap — Landing">
-      <!-- LEFT: Hero -->
-      <div class="hero" id="hero">
-        <div class="brand" aria-hidden="false">
+    <!-- main card -->
+    <section class="card" aria-labelledby="pageTitle">
+      <!-- left: hero text -->
+      <div class="hero">
+        <div class="brand">
           <div class="logo" aria-hidden="true">DS</div>
           <div>
-            <h1 id="main-title">Dinner-Swap</h1>
-            <p class="tag">A gentle way to meet — through food</p>
+            <h1 id="pageTitle">Dinner-Swap</h1>
+            <p>用餐點，溫柔相遇</p>
           </div>
         </div>
 
-        <h2 class="headline">Reduce the nerves. Let food do the talking.</h2>
-        <p class="sub">
-          Share a curated meal anonymously, use food as a warm icebreaker, and
-          discover someone special when the moment is right. Safe, private, and
-          designed to feel a bit romantic and delightfully mysterious.
-        </p>
+        <h2 class="title">降低交友焦慮，讓美食替你破冰</h2>
+        <p class="lead">透過共享餐點作為自然的話題起點，並以匿名外送保護隱私。我們打造溫暖、浪漫且帶有一點神秘感的相遇流程，讓人更自在地開始認識對方。</p>
 
-        <div class="cta" aria-hidden="false">
-          <!--
-            NOTE: Change the href below to your actual Google Form link.
-            Keep target="_blank" to open in a new tab.
-           -->
-          <a class="primary-btn" id="joinBtn" href="https://docs.google.com/forms/d/PLACEHOLDER" target="_blank" rel="noopener noreferrer" aria-label="Join early access — opens Google Form">
-            <!-- simple icon + label -->
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2v20M2 12h20" stroke="rgba(255,255,255,0.95)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <div class="controls" role="group" aria-label="主要操作">
+          <!-- 修改 href 為你的 Google 表單連結 -->
+          <a id="joinBtn" class="btn-primary" href="https://docs.google.com/forms/d/PLACEHOLDER" target="_blank" rel="noopener noreferrer">
+            <!-- 簡單圖示 -->
+            <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" style="flex-shrink:0">
+              <path d="M12 2v20M2 12h20" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            Join Early Access
+            加入搶先體驗
           </a>
-
-          <div class="secondary-hint muted" id="hint">
-            <!-- short reassurance about privacy -->
-            <strong class="muted">Anonymized delivery • Privacy-first</strong>
-          </div>
+          <div class="privacy-note">匿名外送 • 隱私優先</div>
         </div>
 
-        <div class="card-footer muted" aria-hidden="true">
-          <!-- short microcopy -->
-          <small>By joining, you’ll be among the first to try Dinner-Swap. We anonymize meals until both parties choose to reveal.</small>
+        <div class="foot muted" style="text-align:left; margin-top:10px; color:var(--text-muted); font-size:13px;">
+          <div>我們僅在雙方都同意時才揭露身分，尊重每個人的節奏。</div>
         </div>
       </div>
 
-      <!-- RIGHT: Steps -->
-      <aside class="steps" aria-label="How it works">
-        <div style="display:flex;align-items:center;justify-content:space-between;">
-          <div>
-            <h3 style="margin:0;font-size:15px;color:var(--text-muted);font-weight:600;">How it works</h3>
-            <p style="margin:6px 0 0 0;color:var(--text-muted);font-size:13px;">A soft, four-step flow to reduce anxiety and create natural connection.</p>
-          </div>
-          <div style="font-size:12px;color:var(--text-muted);">Estimated time: <strong>~15 min</strong></div>
+      <!-- right: steps panel -->
+      <aside class="panel" aria-label="四步驟流程">
+        <div>
+          <h3>流程概覽</h3>
+          <p class="meta">柔和的四個步驟，從配對到揭露——以食物連結，減少壓力。</p>
         </div>
 
-        <div class="soft-line" aria-hidden="true"></div>
-
-        <div class="steps-grid" role="list">
-          <!-- Step 1 -->
-          <article class="step" role="listitem" tabindex="0" aria-labelledby="s1-title">
-            <div class="step-badge badge-anim" style="background:linear-gradient(135deg,var(--accent-3), rgba(122,215,255,0.9));">1</div>
-            <div class="step-content">
-              <h3 id="s1-title">Match</h3>
-              <p>We subtly suggest people near you based on shared food preferences — no awkward intros required.</p>
+        <div class="steps" role="list">
+          <!-- 1 Match -->
+          <article class="step" role="listitem" tabindex="0" aria-labelledby="t1">
+            <div class="num s1" aria-hidden="true">1</div>
+            <div>
+              <h4 id="t1">配對 (Match)</h4>
+              <p>系統根據餐飲偏好和行為建議配對，避免尷尬的直接介紹。</p>
             </div>
           </article>
 
-          <!-- Step 2 -->
-          <article class="step" role="listitem" tabindex="0" aria-labelledby="s2-title">
-            <div class="step-badge badge-anim" style="background:linear-gradient(135deg,var(--accent-1), rgba(255,122,154,0.95));">2</div>
-            <div class="step-content">
-              <h3 id="s2-title">Choose Meals</h3>
-              <p>You and your match select dishes you’d like. Food choices become the conversation starters.</p>
+          <!-- 2 Choose Meals -->
+          <article class="step" role="listitem" tabindex="0" aria-labelledby="t2">
+            <div class="num s2" aria-hidden="true">2</div>
+            <div>
+              <h4 id="t2">互選餐點 (Choose Meals)</h4>
+              <p>雙方選擇想吃的餐點，餐點本身成為自然的話題起點。</p>
             </div>
           </article>
 
-          <!-- Step 3 -->
-          <article class="step" role="listitem" tabindex="0" aria-labelledby="s3-title">
-            <div class="step-badge badge-anim" style="background:linear-gradient(135deg,var(--accent-2), rgba(255,190,122,0.95));">3</div>
-            <div class="step-content">
-              <h3 id="s3-title">We Place the Orders</h3>
-              <p>Your orders are placed and delivered anonymously — a safe bridge for first contact.</p>
+          <!-- 3 We Place the Orders -->
+          <article class="step" role="listitem" tabindex="0" aria-labelledby="t3">
+            <div class="num s3" aria-hidden="true">3</div>
+            <div>
+              <h4 id="t3">我們代下單 (We Place the Orders)</h4>
+              <p>平台代為下單並以匿名方式送達，保障雙方初次接觸的安全感。</p>
             </div>
           </article>
 
-          <!-- Step 4 (interactive reveal) -->
-          <article id="revealStep" class="step" role="listitem" tabindex="0" aria-labelledby="s4-title" aria-pressed="false">
-            <div class="step-badge badge-anim" style="background:linear-gradient(135deg,var(--accent-1), var(--accent-2));">4</div>
-            <div class="step-content">
-              <h3 id="s4-title">Reveal the Connection</h3>
-              <p>When both people feel comfortable, the veil lifts — chat, meet, or keep it sweet and anonymous.</p>
+          <!-- 4 Reveal the Connection -->
+          <article id="reveal" class="step" role="listitem" tabindex="0" aria-labelledby="t4" aria-pressed="false">
+            <div class="num s4" aria-hidden="true">4</div>
+            <div>
+              <h4 id="t4">揭開連結 (Reveal the Connection)</h4>
+              <p>當雙方都覺得舒服時，可選擇揭露或保持匿名，由你決定下一步。</p>
             </div>
-            <div class="reveal-dot" id="revealDot" title="Reveal status"></div>
+            <div class="reveal-dot" id="revealDot" title="揭露狀態提示"></div>
           </article>
-        </div> <!-- .steps-grid -->
-
-        <div class="soft-line" aria-hidden="true"></div>
-
-        <div style="display:flex;gap:8px;align-items:center;justify-content:space-between;">
-          <div class="muted" style="font-size:13px;">Designed to lower social friction — food first, pressure last.</div>
-          <div style="font-size:12px;color:var(--text-muted);">v1 • Privacy-first</div>
         </div>
+
+        <div style="margin-top:8px; color:var(--text-muted); font-size:13px;">設計來降低社交摩擦 — 以食物為先、隱私為本。</div>
       </aside>
     </section>
+  </div>
 
-    <!-- small foot outside card -->
-    <div class="page-foot" aria-hidden="true">
-      <small>© Dinner-Swap — Crafted with care • Built for gentle connections</small>
-    </div>
+  <script>
+    /* ==========================
+       Particles background
+       - 可透過 :root 變數調整 --particle-count 與 --particle-speed
+       - 為了簡潔與效能，此為輕量實作
+       ========================== */
+    (function(){
+      const canvas = document.getElementById('particles');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let DPR = Math.max(1, window.devicePixelRatio || 1);
 
-    <!-- ===========================
-         Inline JavaScript
-         - Particle background (canvas)
-         - Reveal interaction for step 4 (for demo only, non-destructive)
-         - Accessibility: keyboard activation for reveal
-         =========================== -->
-    <script>
-      /*************************************************************
-       * Particles background
-       *
-       * Key customization:
-       *  - var(--particle-count) : number of particles
-       *  - var(--particle-speed-mult) : speed multiplier
-       *  - colors are derived from CSS variables to match theme
-       *
-       * This is plain JS and runs without external libraries.
-       *************************************************************/
-      (function(){
-        const canvas = document.getElementById('bgParticles');
-        const ctx = canvas.getContext('2d');
-        let DPR = Math.max(1, window.devicePixelRatio || 1);
+      const cssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      const COUNT = Math.max(6, parseInt(cssVar('--particle-count')) || 56);
+      const SPEED = Math.max(0.05, parseFloat(cssVar('--particle-speed')) || 0.35);
+      const colors = [ cssVar('--accent-warm') || '#ff7a9a', cssVar('--accent-soft') || '#ffb87a', cssVar('--accent-cool') || '#7ad7ff' ];
 
-        // get CSS var helpers
-        const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      function resize(){
+        DPR = Math.max(1, window.devicePixelRatio || 1);
+        canvas.width = Math.ceil(window.innerWidth * DPR);
+        canvas.height = Math.ceil(window.innerHeight * DPR);
+        canvas.style.width = window.innerWidth + 'px';
+        canvas.style.height = window.innerHeight + 'px';
+        ctx.setTransform(DPR,0,0,DPR,0,0);
+      }
+      window.addEventListener('resize', resize, {passive:true});
+      resize();
 
-        let settings = {
-          count: Math.max(10, parseInt(css('--particle-count')) || 60),
-          speedMult: parseFloat(css('--particle-speed-mult')) || 0.4,
-          colors: [
-            css('--accent-1') || '#ff7a9a',
-            css('--accent-2') || '#ffbe7a',
-            css('--accent-3') || '#7ad7ff'
-          ],
-          maxSize: 3.8,
-          minSize: 0.8,
-          drift: 0.2
-        };
-
-        function resize(){
-          DPR = Math.max(1, window.devicePixelRatio || 1);
-          canvas.width = Math.ceil(window.innerWidth * DPR);
-          canvas.height = Math.ceil(window.innerHeight * DPR);
-          canvas.style.width = window.innerWidth + 'px';
-          canvas.style.height = window.innerHeight + 'px';
-          ctx.setTransform(DPR,0,0,DPR,0,0);
-        }
-        window.addEventListener('resize', resize, {passive:true});
-        resize();
-
-        // build particles
-        const particles = [];
-        function rand(min,max){ return Math.random()*(max-min)+min; }
-        for(let i=0;i<settings.count;i++){
-          particles.push({
-            x: rand(0, canvas.width / DPR),
-            y: rand(0, canvas.height / DPR),
-            vx: rand(-0.25,0.25) * settings.speedMult,
-            vy: rand(-0.15,0.15) * settings.speedMult,
-            size: rand(settings.minSize, settings.maxSize),
-            color: settings.colors[Math.floor(Math.random()*settings.colors.length)],
-            alpha: rand(0.08, 0.5)
-          });
-        }
-
-        let last = performance.now();
-        function step(now){
-          const dt = Math.min(40, now - last) / 16.666; // normalized
-          last = now;
-
-          ctx.clearRect(0,0,canvas.width, canvas.height);
-
-          for (const p of particles){
-            // simple movement with mild vertical drift
-            p.x += p.vx * dt * (1 + Math.sin(now/6000)*0.6);
-            p.y += p.vy * dt * (1 + Math.cos(now/5000)*0.4) + (p.size * 0.02);
-
-            // wrap-around edges
-            if (p.x < -20) p.x = canvas.width / DPR + 20;
-            if (p.x > canvas.width / DPR + 20) p.x = -20;
-            if (p.y < -20) p.y = canvas.height / DPR + 20;
-            if (p.y > canvas.height / DPR + 20) p.y = -20;
-
-            // draw
-            ctx.beginPath();
-            ctx.fillStyle = p.color;
-            ctx.globalAlpha = p.alpha;
-            ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
-            ctx.fill();
-          }
-          ctx.globalAlpha = 1;
-          requestAnimationFrame(step);
-        }
-
-        // reduce motion if user prefers
-        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (!reduced) requestAnimationFrame(step);
-        else {
-          // single subtle render if reduced motion
-          for (const p of particles){
-            ctx.beginPath();
-            ctx.fillStyle = p.color;
-            ctx.globalAlpha = p.alpha;
-            ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
-            ctx.fill();
-          }
-          ctx.globalAlpha = 1;
-        }
-      })();
-
-      /*************************************************************
-       * "Reveal the Connection" interactive demo
-       * - toggles a visual state on the 4th step
-       * - This is intentionally simple: in a real product, this
-       *   would be tied to backend state and user consent flows.
-       *
-       * Accessibility:
-       * - step is focusable and toggleable via Enter/Space.
-       *************************************************************/
-      (function(){
-        const revealStep = document.getElementById('revealStep');
-        const revealDot = document.getElementById('revealDot');
-
-        let revealed = false;
-        function setRevealed(val){
-          revealed = !!val;
-          if(revealed){
-            revealStep.classList.add('revealed');
-            revealStep.setAttribute('aria-pressed', 'true');
-            revealDot.setAttribute('title','Connection revealed');
-          }else{
-            revealStep.classList.remove('revealed');
-            revealStep.setAttribute('aria-pressed', 'false');
-            revealDot.setAttribute('title','Reveal status');
-          }
-        }
-
-        // simple toggle on click for demo purposes
-        revealStep.addEventListener('click', function(e){
-          setRevealed(!revealed);
+      const particles = [];
+      function rand(a,b){ return Math.random()*(b-a)+a; }
+      for (let i=0;i<COUNT;i++){
+        particles.push({
+          x: rand(0, canvas.width/DPR),
+          y: rand(0, canvas.height/DPR),
+          r: rand(0.6, 3.8),
+          vx: rand(-0.2, 0.2)*SPEED,
+          vy: rand(-0.08, 0.08)*SPEED,
+          col: colors[Math.floor(Math.random()*colors.length)],
+          a: rand(0.06, 0.45)
         });
-        // keyboard activation
-        revealStep.addEventListener('keydown', function(e){
-          if (e.key === 'Enter' || e.key === ' '){
-            e.preventDefault();
-            setRevealed(!revealed);
-          }
-        });
+      }
 
-        // optional: show a small confetti-like pulse when revealed
-        function pulse(){
-          if (!revealed) return;
-          const el = document.createElement('span');
-          el.style.position = 'absolute';
-          el.style.pointerEvents = 'none';
-          el.style.width = '160px';
-          el.style.height = '160px';
-          el.style.left = 'calc(100% - 220px)';
-          el.style.top = '10px';
-          el.style.borderRadius = '50%';
-          el.style.background = 'radial-gradient(circle at 30% 30%, rgba(255,122,154,0.12), rgba(255,190,122,0.06))';
-          el.style.opacity = '0.9';
-          el.style.zIndex = '3';
-          el.style.transition = 'transform .9s ease-out, opacity .9s ease-out';
-          el.style.transform = 'scale(.6)';
-          document.body.appendChild(el);
-          requestAnimationFrame(()=> {
-            el.style.transform = 'scale(1.6)';
-            el.style.opacity = '0';
-          });
-          setTimeout(()=> el.remove(), 900);
+      let last = performance.now();
+      function frame(now){
+        const dt = Math.min(40, now - last)/16.666;
+        last = now;
+        ctx.clearRect(0,0,canvas.width, canvas.height);
+        for (const p of particles){
+          p.x += p.vx * dt * (1 + Math.sin(now/5000)*0.6);
+          p.y += p.vy * dt * (1 + Math.cos(now/4500)*0.4) + (p.r * 0.02);
+          if (p.x < -10) p.x = canvas.width/DPR + 10;
+          if (p.x > canvas.width/DPR + 10) p.x = -10;
+          if (p.y < -10) p.y = canvas.height/DPR + 10;
+          if (p.y > canvas.height/DPR + 10) p.y = -10;
+          ctx.beginPath();
+          ctx.fillStyle = p.col;
+          ctx.globalAlpha = p.a;
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+          ctx.fill();
         }
+        ctx.globalAlpha = 1;
+        requestAnimationFrame(frame);
+      }
 
-        // watch for reveal state changes (simple hook)
-        const observer = new MutationObserver(()=> {
-          if (revealStep.classList.contains('revealed')) pulse();
-        });
-        observer.observe(revealStep, { attributes:true, attributeFilter: ['class'] });
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!reduced) requestAnimationFrame(frame);
+      else {
+        // draw static faint dots if reduced motion
+        for (const p of particles){
+          ctx.beginPath();
+          ctx.fillStyle = p.col;
+          ctx.globalAlpha = p.a;
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+      }
+    })();
 
-        // initialize
-        setRevealed(false);
-      })();
+    /* ==========================
+       Reveal step interactivity (demo)
+       - 點擊或以鍵盤 (Enter/Space) 切換 reveal 樣式
+       - 真實用途請接後端同意機制
+       ========================== */
+    (function(){
+      const reveal = document.getElementById('reveal');
+      const dot = document.getElementById('revealDot');
+      if (!reveal || !dot) return;
+      let on = false;
+      function setOn(v){
+        on = !!v;
+        if (on) reveal.classList.add('revealed'), reveal.setAttribute('aria-pressed','true'), dot.setAttribute('title','已揭露');
+        else reveal.classList.remove('revealed'), reveal.setAttribute('aria-pressed','false'), dot.setAttribute('title','揭露狀態');
+      }
+      reveal.addEventListener('click', ()=> setOn(!on));
+      reveal.addEventListener('keydown', (e)=> {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOn(!on); }
+      });
+      setOn(false);
+    })();
 
-      /*************************************************************
-       * Minimal progressive enhancement for the "Join" button:
-       * - adds a small click ripple and protects against accidental clicks
-       *************************************************************/
-      (function(){
-        const btn = document.getElementById('joinBtn');
-        btn.addEventListener('click', function(e){
-          // quick visual feedback: tiny scale
-          btn.style.transition = 'transform .12s ease';
-          btn.style.transform = 'scale(.985)';
-          setTimeout(()=> btn.style.transform = '', 120);
-          // here we do not prevent navigation; link opens in new tab
-        });
-      })();
+    /* ==========================
+       Join button micro-feedback
+       - 點擊時短暫縮放反饋（不攔截開新分頁）
+       ========================== */
+    (function(){
+      const btn = document.getElementById('joinBtn');
+      if (!btn) return;
+      btn.addEventListener('click', ()=> {
+        btn.style.transition = 'transform .12s ease';
+        btn.style.transform = 'scale(.985)';
+        setTimeout(()=> btn.style.transform = '', 120);
+      });
+    })();
 
-      /*************************************************************
-       * NOTES / TIPS (in-code comments for future customization)
-       * - To change the Google Form link, edit the href of #joinBtn.
-       * - Adjust color theme via CSS variables at top (accent colors, bg).
-       * - To reduce particles for mobile, lower --particle-count.
-       * - To completely disable animation for performance, remove the canvas element.
-       *************************************************************/
-    </script>
-  </main>
+    /* ==========================
+       開發者備註（請保留於此檔或記錄外部）
+       - 更換 Google 表單：修改 #joinBtn 的 href
+       - 關閉粒子動畫：移除 <canvas id="particles"> 或將 --particle-count 設為 0
+       - 調色：修改 :root 變數 --accent-*
+       - 若需使用實際圖片，請將 <svg.hero-illustration> 替換為 data URI 或 inline SVG（同檔案）
+       ========================== */
+  </script>
 </body>
 </html>
 
