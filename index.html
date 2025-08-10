@@ -1,558 +1,672 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Féplace - Your After-Hours Workspace</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .hero-bg {
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=2940&auto=format&fit=crop') center center/cover no-repeat;
-        }
-        /* 動態渲染效果的 CSS */
-        .scroll-animate {
-            opacity: 0;
-            transform: translateY(40px);
-            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-        }
-        .scroll-animate.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        /* 模態框淡入淡出效果 */
-        .modal {
-            transition: opacity 0.3s ease;
-        }
-        /* 圖片輪播 */
-        .slider-container {
-            position: relative;
-            overflow: hidden;
-        }
-        .slider-wrapper {
-            display: flex;
-            transition: transform 0.5s ease-in-out;
-        }
-        .slider-item {
-            min-width: 100%;
-            box-sizing: border-box;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dinner-Swap — Early Access</title>
+
+  <!--
+    Dinner-Swap Landing Page
+    - Single-file HTML/CSS/JS (no external deps)
+    - Brand values implemented: reduce social anxiety, food as icebreaker,
+      anonymized delivery feel, warm romantic + slightly mysterious atmosphere,
+      Apple-like modern minimalist aesthetic.
+    - Customize colors / speeds / copy via CSS variables below.
+    -->
+
+  <style>
+    /* ===========================
+       CUSTOMIZATION VARIABLES
+       Change these to tweak brand styling / animation
+       =========================== */
+    :root{
+      /* Brand color palette (modify to suit your brand) */
+      --bg-deep: #0f0b1a;           /* deep background base */
+      --accent-1: #ff7a9a;         /* warm pink (romantic) */
+      --accent-2: #ffbe7a;         /* warm apricot */
+      --accent-3: #7ad7ff;         /* cool contrast */
+      --glass: rgba(255,255,255,0.06); /* subtle glass panel */
+      --glass-2: rgba(255,255,255,0.03);
+      --text-strong: rgba(255,255,255,0.95);
+      --text-muted: rgba(255,255,255,0.68);
+
+      /* Motion / particle tuning */
+      --gradient-speed: 18s;        /* background gradient animation duration */
+      --particle-count: 60;         /* number of canvas particles */
+      --particle-speed-mult: 0.4;   /* particle speed multiplier */
+      --step-card-hover-scale: 1.03;
+      --radius: 16px;               /* card corner radius (Apple-like) */
+
+      /* Layout */
+      --max-width: 1100px;
+      --gutter: 20px;
+      --glass-blur: 10px;
+      --content-padding: 32px;
+      --mobile-break: 820px;
+    }
+
+    /* Accessibility: respect user preference for reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      :root{
+        --gradient-speed: 120s;
+      }
+    }
+
+    /* ===========================
+       Base / Apple-like Typography
+       =========================== */
+    html,body{
+      height:100%;
+      background:var(--bg-deep);
+      margin:0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
+                   "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      color:var(--text-strong);
+    }
+
+    /* full-bleed container for animated gradient & particles */
+    .site {
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      overflow:hidden;
+    }
+
+    /* animated gradient layer */
+    .bg-gradient {
+      position:absolute;
+      inset:0;
+      z-index:0;
+      background: linear-gradient(120deg,
+        rgba(255,122,154,0.12) 0%,
+        rgba(255,190,122,0.10) 25%,
+        rgba(122,215,255,0.06) 55%,
+        rgba(140,90,200,0.08) 80%,
+        rgba(255,122,154,0.12) 100%);
+      filter: blur(40px) saturate(1.05);
+      transform: translateZ(0);
+      animation: slideGradient var(--gradient-speed) linear infinite;
+      mix-blend-mode: screen;
+    }
+    @keyframes slideGradient {
+      0% { transform: translateX(-10%) translateY(-5%) scale(1.05) rotate(0deg); }
+      50% { transform: translateX(10%) translateY(5%) scale(1.08) rotate(2deg); }
+      100% { transform: translateX(-10%) translateY(-5%) scale(1.05) rotate(0deg); }
+    }
+
+    /* particle canvas sits above gradient but behind content */
+    canvas.bg-particles{
+      position:absolute;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+      opacity:0.85;
+      mix-blend-mode: screen;
+    }
+
+    /* content card (glass-like) */
+    .card {
+      width: min(100%, var(--max-width));
+      margin: 48px;
+      position:relative;
+      z-index:2;
+      display:flex;
+      gap:32px;
+      align-items:stretch;
+      justify-content:space-between;
+      padding: clamp(18px, 3vw, 36px);
+      box-sizing:border-box;
+      border-radius: calc(var(--radius) + 6px);
+      background: linear-gradient(180deg, var(--glass), var(--glass-2));
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+      box-shadow: 0 10px 30px rgba(5,8,20,0.6);
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+
+    /* left column: headline / CTA */
+    .hero {
+      flex:1 1 420px;
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+      min-width:260px;
+    }
+
+    .brand {
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .logo {
+      width:56px;
+      height:56px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+      box-shadow: 0 6px 18px rgba(255,122,154,0.12), inset 0 -6px 14px rgba(255,255,255,0.06);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:700;
+      color:#fff;
+      font-size:20px;
+      letter-spacing:0.6px;
+    }
+    .brand h1{
+      margin:0;
+      font-size:18px;
+      font-weight:600;
+      color:var(--text-strong);
+      letter-spacing:0.2px;
+    }
+    .tag {
+      margin:0;
+      font-size:13px;
+      color:var(--text-muted);
+      font-weight:500;
+    }
+
+    .headline {
+      font-size: clamp(20px, 3.6vw, 34px);
+      line-height:1.02;
+      margin:0;
+      font-weight:700;
+      color:var(--text-strong);
+      letter-spacing:-0.4px;
+    }
+
+    .sub {
+      margin:0;
+      color:var(--text-muted);
+      font-size:15px;
+      line-height:1.5;
+      max-width:48ch;
+    }
+
+    /* CTA */
+    .cta {
+      margin-top:8px;
+      display:flex;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .primary-btn{
+      --pad-y:12px;
+      --pad-x:20px;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding: var(--pad-y) var(--pad-x);
+      border-radius: 14px;
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+      color:white;
+      font-weight:700;
+      border: none;
+      cursor:pointer;
+      font-size:15px;
+      box-shadow: 0 8px 30px rgba(255,122,154,0.18);
+      transition: transform .18s cubic-bezier(.2,.9,.25,1), box-shadow .18s;
+      text-decoration:none;
+    }
+    .primary-btn:active{ transform: translateY(1px); }
+    .primary-btn:focus{ outline:3px solid rgba(255,122,154,0.18); outline-offset:3px; }
+
+    .secondary-hint{
+      color:var(--text-muted);
+      font-size:13px;
+      align-self:center;
+    }
+
+    /* right column: steps */
+    .steps {
+      width: min(520px, 46%);
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+      align-items:stretch;
+    }
+
+    .steps-grid{
+      display:grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap:14px;
+    }
+
+    .step {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius: var(--radius);
+      padding: 18px;
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      transition: transform .26s cubic-bezier(.2,.9,.25,1), box-shadow .26s;
+      cursor:default;
+      border: 1px solid rgba(255,255,255,0.03);
+      min-height:88px;
+    }
+    .step:hover{
+      transform: translateY(-6px) scale(var(--step-card-hover-scale));
+      box-shadow: 0 16px 40px rgba(2,6,23,0.5);
+    }
+
+    .step-badge{
+      min-width:56px;
+      height:56px;
+      border-radius:12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:700;
+      color:white;
+      font-size:18px;
+      flex-shrink:0;
+      box-shadow: inset 0 -6px 12px rgba(0,0,0,0.12);
+    }
+    .step-content h3{
+      margin:0;
+      font-size:16px;
+      color:var(--text-strong);
+    }
+    .step-content p{
+      margin:6px 0 0 0;
+      color:var(--text-muted);
+      font-size:13px;
+      line-height:1.35;
+    }
+
+    /* subtle footer small text inside card */
+    .card-footer {
+      margin-top:6px;
+      font-size:12px;
+      color:var(--text-muted);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: calc(var(--mobile-break) * 1px)) {
+      .card{
+        flex-direction:column;
+        gap:20px;
+      }
+      .steps { width:100%; }
+      .steps-grid{ grid-template-columns: 1fr; }
+    }
+
+    /* small helper: soft divider */
+    .soft-line{
+      height:1px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      border-radius:1px;
+      margin:12px 0;
+    }
+
+    /* Footer outside card */
+    .page-foot{
+      margin-top:18px;
+      font-size:12px;
+      color:var(--text-muted);
+      text-align:center;
+      z-index:2;
+      position:relative;
+    }
+
+    /* tiny micro-animation for the badges */
+    .badge-anim { animation: floatBadge 6s ease-in-out infinite; }
+    @keyframes floatBadge {
+      0%{ transform: translateY(0); }
+      50%{ transform: translateY(-6px); }
+      100%{ transform: translateY(0); }
+    }
+
+    /* small reveal animation for 'Reveal the Connection' step */
+    .reveal-dot {
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:rgba(255,255,255,0.12);
+      margin-left:auto;
+      margin-top:6px;
+      box-shadow: 0 6px 18px rgba(255,122,154,0.06);
+      transition: background .26s, transform .26s;
+    }
+    .step.revealed .reveal-dot {
+      background: linear-gradient(90deg,var(--accent-1),var(--accent-2));
+      transform: scale(1.25);
+    }
+
+    /* Utility */
+    .muted { color:var(--text-muted); }
+    a { color:inherit; text-decoration:none; }
+
+  </style>
 </head>
-<body class="bg-gray-900 text-white">
+<body>
+  <main class="site" role="main" aria-labelledby="main-title">
+    <!-- animated gradient layer -->
+    <div class="bg-gradient" aria-hidden="true"></div>
 
-    <!-- Header -->
-    <header class="absolute top-0 left-0 w-full z-20 p-4">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold" data-key="title">Féplace</h1>
-            <nav class="hidden md:flex space-x-6 items-center">
-                <a href="#features" class="hover:text-amber-400 transition" data-key="nav_features">Features</a>
-                <a href="#how-it-works" class="hover:text-amber-400 transition" data-key="nav_how">How It Works</a>
-                <a href="#locations" class="hover:text-amber-400 transition" data-key="nav_locations">Locations</a>
-                <div class="flex items-center space-x-2 text-sm">
-                    <button onclick="setLanguage('en')" class="font-semibold hover:text-amber-400 transition">EN</button>
-                    <span>/</span>
-                    <button onclick="setLanguage('zh-tw')" class="font-semibold hover:text-amber-400 transition">繁中</button>
-                </div>
-                <button class="signup-btn bg-amber-500 hover:bg-amber-600 text-gray-900 font-bold py-2 px-4 rounded-lg transition" data-key="nav_signup">Sign Up</button>
-            </nav>
-            <!-- 行動版漢堡選單按鈕 -->
-            <button id="menu-open-btn" class="md:hidden text-2xl">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-            </button>
-        </div>
-    </header>
+    <!-- particles canvas (JS draws here) -->
+    <canvas class="bg-particles" id="bgParticles" aria-hidden="true"></canvas>
 
-    <!-- 行動版選單 (預設隱藏) -->
-    <div id="mobile-menu" class="hidden fixed inset-0 bg-gray-900 bg-opacity-95 z-50 flex flex-col items-center justify-center">
-        <button id="menu-close-btn" class="absolute top-5 right-5 text-3xl">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-        </button>
-        <nav class="flex flex-col items-center space-y-8 text-2xl">
-            <a href="#features" class="hover:text-amber-400 transition mobile-menu-link" data-key="nav_features">Features</a>
-            <a href="#how-it-works" class="hover:text-amber-400 transition mobile-menu-link" data-key="nav_how">How It Works</a>
-            <a href="#locations" class="hover:text-amber-400 transition mobile-menu-link" data-key="nav_locations">Locations</a>
-            <button class="signup-btn bg-amber-500 hover:bg-amber-600 text-gray-900 font-bold py-3 px-6 rounded-lg transition mt-4 mobile-menu-link" data-key="nav_signup">Sign Up</button>
-        </nav>
-         <div class="flex items-center space-x-4 text-lg mt-8">
-            <button onclick="setLanguage('en')" class="font-semibold hover:text-amber-400 transition">EN</button>
-            <span class="text-gray-500">/</span>
-            <button onclick="setLanguage('zh-tw')" class="font-semibold hover:text-amber-400 transition">繁中</button>
+    <!-- content card -->
+    <section class="card" aria-label="Dinner Swap — Landing">
+      <!-- LEFT: Hero -->
+      <div class="hero" id="hero">
+        <div class="brand" aria-hidden="false">
+          <div class="logo" aria-hidden="true">DS</div>
+          <div>
+            <h1 id="main-title">Dinner-Swap</h1>
+            <p class="tag">A gentle way to meet — through food</p>
+          </div>
         </div>
+
+        <h2 class="headline">Reduce the nerves. Let food do the talking.</h2>
+        <p class="sub">
+          Share a curated meal anonymously, use food as a warm icebreaker, and
+          discover someone special when the moment is right. Safe, private, and
+          designed to feel a bit romantic and delightfully mysterious.
+        </p>
+
+        <div class="cta" aria-hidden="false">
+          <!--
+            NOTE: Change the href below to your actual Google Form link.
+            Keep target="_blank" to open in a new tab.
+           -->
+          <a class="primary-btn" id="joinBtn" href="https://docs.google.com/forms/d/PLACEHOLDER" target="_blank" rel="noopener noreferrer" aria-label="Join early access — opens Google Form">
+            <!-- simple icon + label -->
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2v20M2 12h20" stroke="rgba(255,255,255,0.95)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Join Early Access
+          </a>
+
+          <div class="secondary-hint muted" id="hint">
+            <!-- short reassurance about privacy -->
+            <strong class="muted">Anonymized delivery • Privacy-first</strong>
+          </div>
+        </div>
+
+        <div class="card-footer muted" aria-hidden="true">
+          <!-- short microcopy -->
+          <small>By joining, you’ll be among the first to try Dinner-Swap. We anonymize meals until both parties choose to reveal.</small>
+        </div>
+      </div>
+
+      <!-- RIGHT: Steps -->
+      <aside class="steps" aria-label="How it works">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <h3 style="margin:0;font-size:15px;color:var(--text-muted);font-weight:600;">How it works</h3>
+            <p style="margin:6px 0 0 0;color:var(--text-muted);font-size:13px;">A soft, four-step flow to reduce anxiety and create natural connection.</p>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);">Estimated time: <strong>~15 min</strong></div>
+        </div>
+
+        <div class="soft-line" aria-hidden="true"></div>
+
+        <div class="steps-grid" role="list">
+          <!-- Step 1 -->
+          <article class="step" role="listitem" tabindex="0" aria-labelledby="s1-title">
+            <div class="step-badge badge-anim" style="background:linear-gradient(135deg,var(--accent-3), rgba(122,215,255,0.9));">1</div>
+            <div class="step-content">
+              <h3 id="s1-title">Match</h3>
+              <p>We subtly suggest people near you based on shared food preferences — no awkward intros required.</p>
+            </div>
+          </article>
+
+          <!-- Step 2 -->
+          <article class="step" role="listitem" tabindex="0" aria-labelledby="s2-title">
+            <div class="step-badge badge-anim" style="background:linear-gradient(135deg,var(--accent-1), rgba(255,122,154,0.95));">2</div>
+            <div class="step-content">
+              <h3 id="s2-title">Choose Meals</h3>
+              <p>You and your match select dishes you’d like. Food choices become the conversation starters.</p>
+            </div>
+          </article>
+
+          <!-- Step 3 -->
+          <article class="step" role="listitem" tabindex="0" aria-labelledby="s3-title">
+            <div class="step-badge badge-anim" style="background:linear-gradient(135deg,var(--accent-2), rgba(255,190,122,0.95));">3</div>
+            <div class="step-content">
+              <h3 id="s3-title">We Place the Orders</h3>
+              <p>Your orders are placed and delivered anonymously — a safe bridge for first contact.</p>
+            </div>
+          </article>
+
+          <!-- Step 4 (interactive reveal) -->
+          <article id="revealStep" class="step" role="listitem" tabindex="0" aria-labelledby="s4-title" aria-pressed="false">
+            <div class="step-badge badge-anim" style="background:linear-gradient(135deg,var(--accent-1), var(--accent-2));">4</div>
+            <div class="step-content">
+              <h3 id="s4-title">Reveal the Connection</h3>
+              <p>When both people feel comfortable, the veil lifts — chat, meet, or keep it sweet and anonymous.</p>
+            </div>
+            <div class="reveal-dot" id="revealDot" title="Reveal status"></div>
+          </article>
+        </div> <!-- .steps-grid -->
+
+        <div class="soft-line" aria-hidden="true"></div>
+
+        <div style="display:flex;gap:8px;align-items:center;justify-content:space-between;">
+          <div class="muted" style="font-size:13px;">Designed to lower social friction — food first, pressure last.</div>
+          <div style="font-size:12px;color:var(--text-muted);">v1 • Privacy-first</div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- small foot outside card -->
+    <div class="page-foot" aria-hidden="true">
+      <small>© Dinner-Swap — Crafted with care • Built for gentle connections</small>
     </div>
 
-
-    <!-- Hero Section -->
-    <section class="hero-bg h-screen flex items-center justify-center">
-        <div class="text-center px-4">
-            <h2 class="text-4xl sm:text-5xl md:text-7xl font-extrabold mb-4 leading-tight" data-key="hero_title">Unlock the Night: Your After-Hours Workspace</h2>
-            <p class="text-base md:text-xl text-gray-300 mb-8 max-w-2xl mx-auto" data-key="hero_subtitle">Turn quiet cafe nights into your next productive session. Find and book unique, inspiring spaces when you need them most.</p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="#locations" class="bg-amber-500 hover:bg-amber-600 text-gray-900 font-bold py-3 px-8 rounded-lg text-lg transition" data-key="hero_explore">Explore Cafes</a>
-                <a href="#how-it-works" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-lg text-lg transition" data-key="hero_learn">Learn More</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- How It Works Section -->
-    <section id="how-it-works" class="py-16 md:py-20 bg-gray-800">
-        <div class="container mx-auto px-4 text-center">
-            <h3 class="text-3xl md:text-4xl font-bold mb-2 scroll-animate" data-key="how_title">How It Works</h3>
-            <p class="text-gray-400 mb-12 scroll-animate" data-key="how_subtitle">Productivity in three simple steps.</p>
-            <div class="grid md:grid-cols-3 gap-10 md:gap-12">
-                <div class="flex flex-col items-center scroll-animate">
-                    <div class="bg-gray-700 p-6 rounded-full mb-4">
-                        <svg class="w-12 h-12 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    </div>
-                    <h4 class="text-xl md:text-2xl font-bold mb-2" data-key="how_step1_title">1. Find a Space</h4>
-                    <p class="text-gray-400" data-key="how_step1_desc">Browse our curated list of late-night cafes. Filter by location, amenities, and vibe.</p>
-                </div>
-                <div class="flex flex-col items-center scroll-animate" style="transition-delay: 200ms;">
-                    <div class="bg-gray-700 p-6 rounded-full mb-4">
-                        <svg class="w-12 h-12 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                    </div>
-                    <h4 class="text-xl md:text-2xl font-bold mb-2" data-key="how_step2_title">2. Book Your Spot</h4>
-                    <p class="text-gray-400" data-key="how_step2_desc">Reserve your table or seat for the hours you need. Secure and simple online payment.</p>
-                </div>
-                <div class="flex flex-col items-center scroll-animate" style="transition-delay: 400ms;">
-                    <div class="bg-gray-700 p-6 rounded-full mb-4">
-                        <svg class="w-12 h-12 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
-                    </div>
-                    <h4 class="text-xl md:text-2xl font-bold mb-2" data-key="how_step3_title">3. Work & Enjoy</h4>
-                    <p class="text-gray-400" data-key="how_step3_desc">Show up, connect to Wi-Fi, and get to work. Enjoy the unique ambiance of a cafe after dark.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- Featured Location Section -->
-    <section id="locations" class="py-16 md:py-20">
-        <div class="container mx-auto px-4">
-            <h3 class="text-3xl md:text-4xl font-bold text-center mb-12 scroll-animate" data-key="featured_title">Featured Location</h3>
-            <div class="bg-gray-800 rounded-lg overflow-hidden md:flex md:items-stretch shadow-lg scroll-animate">
-                <div class="md:w-1/2 slider-container">
-                    <div class="slider-wrapper">
-                        <img src="https://lh3.googleusercontent.com/gps-cs-s/AC9h4npZPW47w7xxjxrrHgcc9kQy3XURlYSQtr6JIAcMZ9u3TuD7tHPfNHxIp5c7n7Hb5sRq_ctZ6F-8WdzIfH-3Gsc9ouqCUxkggoAAjETu21fo8DRYZEZXV6vds34L36nQnRU0WtzYNQ=s1024-v1" alt="日出咖啡 (Sunrise Cafe) 內部一" class="slider-item w-full h-64 md:h-full object-cover">
-                        <img src="https://lh3.googleusercontent.com/gps-cs-s/AC9h4nqNclYXiOWnsEX84e9LQuSh812bwNeRqVmpu87skF5V9AcNBgUIfq22nsn4YPMURKSjyG0jywC8OuyK7csvfLxV8djh2INyenKijwkZZtFKaqfaNfOricGkOzNl4eDgSmm9QNTfqQ=s1024-v1" alt="日出咖啡 (Sunrise Cafe) 內部二" class="slider-item w-full h-64 md:h-full object-cover">
-                        <img src="https://lh3.googleusercontent.com/gps-cs-s/AC9h4nrrfGB_L5N7tH45dyK6qarNtPZwJykTKfdON1pmVDTymVdOnSQXS_gSVDGybDmEtgOyELmZ58K_UigQUHrJt4NTL3E_ntsx1R10tDmJh8rnB_VzN8gFpFU76BnCbiYpvKZiD0PC=s626-k-no" alt="日出咖啡 (Sunrise Cafe) 外部" class="slider-item w-full h-64 md:h-full object-cover">
-                    </div>
-                    <button class="slider-prev absolute top-1/2 left-2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition">
-                        &#10094;
-                    </button>
-                    <button class="slider-next absolute top-1/2 right-2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition">
-                        &#10095;
-                    </button>
-                </div>
-                <div class="md:w-1/2 p-6 md:p-8 lg:p-12 flex flex-col justify-center">
-                    <h4 class="text-2xl lg:text-3xl font-bold mb-2">日出咖啡 (Sunrise Cafe)</h4>
-                    <p class="text-amber-400 mb-4">Hsinchu, Taiwan</p>
-                    <p class="text-gray-300 mb-6" data-key="featured_desc">A cozy and modern cafe known for its specialty coffee and welcoming atmosphere. Perfect for focused work or quiet contemplation after the sun goes down.</p>
-                    <div class="flex flex-col space-y-3 mb-6">
-                        <a href="https://maps.app.goo.gl/tqsAinzTe2SbonTN8" target="_blank" rel="noopener noreferrer" class="group">
-                            <div class="flex items-start transition-colors duration-300 group-hover:text-amber-500">
-                                <svg class="w-6 h-6 text-amber-400 mr-3 flex-shrink-0 mt-1 transition-colors duration-300 group-hover:text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                                <span data-key="featured_address">300新竹市東區金城二路4號</span>
-                            </div>
-                        </a>
-                        <div class="flex items-center">
-                            <svg class="w-6 h-6 text-amber-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            <span data-key="featured_hours">Night Owl Hours: 7:00 PM - 1:00 AM</span>
-                        </div>
-                         <div class="flex items-center">
-                            <svg class="w-6 h-6 text-amber-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"></path></svg>
-                             <span data-key="featured_amenities">High-Speed Wi-Fi & Power Outlets</span>
-                        </div>
-                    </div>
-                    <button class="booking-btn bg-amber-500 hover:bg-amber-600 text-gray-900 font-bold py-3 px-6 rounded-lg inline-block transition" data-key="featured_book">Book a Spot</button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section id="features" class="py-16 md:py-20 bg-gray-800">
-        <div class="container mx-auto px-4">
-            <h3 class="text-3xl md:text-4xl font-bold text-center mb-12 scroll-animate" data-key="why_title">Why Choose Féplace?</h3>
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <div class="bg-gray-900 p-6 rounded-lg text-center scroll-animate">
-                    <h4 class="text-xl font-bold text-amber-400 mb-2" data-key="feature1_title">Flexible Hours</h4>
-                    <p class="text-gray-400" data-key="feature1_desc">Work on your schedule. Our spaces are available when traditional co-working spots are closed.</p>
-                </div>
-                <div class="bg-gray-900 p-6 rounded-lg text-center scroll-animate" style="transition-delay: 200ms;">
-                    <h4 class="text-xl font-bold text-amber-400 mb-2" data-key="feature2_title">Unique Ambiance</h4>
-                    <p class="text-gray-400" data-key="feature2_desc">Experience the focus and calm of a cafe at night. Less noise, more flow.</p>
-                </div>
-                <div class="bg-gray-900 p-6 rounded-lg text-center scroll-animate" style="transition-delay: 400ms;">
-                    <h4 class="text-xl font-bold text-amber-400 mb-2" data-key="feature3_title">Curated Locations</h4>
-                    <p class="text-gray-400" data-key="feature3_desc">We partner with the best independent cafes, each with its own character and charm.</p>
-                </div>
-                <div class="bg-gray-900 p-6 rounded-lg text-center scroll-animate" style="transition-delay: 600ms;">
-                    <h4 class="text-xl font-bold text-amber-400 mb-2" data-key="feature4_title">Community</h4>
-                    <p class="text-gray-400" data-key="feature4_desc">Connect with fellow night owls, freelancers, and creatives in a relaxed setting.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Call to Action Section -->
-    <section class="py-16 md:py-20">
-        <div class="container mx-auto px-4 text-center">
-            <h3 class="text-3xl md:text-4xl font-bold mb-4 scroll-animate" data-key="cta_title">Ready to Reclaim Your Nights?</h3>
-            <p class="text-gray-400 mb-8 text-lg max-w-xl mx-auto scroll-animate" data-key="cta_subtitle">Join the Féplace community and discover your new favorite workspace.</p>
-            <button class="signup-btn bg-amber-500 hover:bg-amber-600 text-gray-900 font-extrabold py-4 px-10 rounded-lg text-xl transition scroll-animate" data-key="cta_button">Get Started Now</button>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-gray-800 py-8">
-        <div class="container mx-auto px-4 text-center text-gray-400">
-            <p data-key="footer_copy">&copy; 2025 Féplace. All Rights Reserved.</p>
-            <div class="flex justify-center space-x-4 mt-4">
-                <a href="#" class="hover:text-amber-400" data-key="footer_privacy">Privacy Policy</a>
-                <a href="#" class="hover:text-amber-400" data-key="footer_terms">Terms of Service</a>
-                <a href="#" class="hover:text-amber-400" data-key="footer_contact">Contact</a>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Modals -->
-    <!-- Booking Modal -->
-    <div id="booking-modal" class="modal hidden fixed inset-0 bg-gray-900 bg-opacity-75 z-50 flex items-center justify-center p-4 opacity-0">
-        <div class="bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6 relative">
-            <button class="modal-close-btn absolute top-4 right-4 text-gray-500 hover:text-white">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-            <h3 class="text-2xl font-bold mb-4" data-key="booking_title">Book a Spot at 日出咖啡</h3>
-            <form id="booking-form">
-                <div class="mb-4">
-                    <label for="booking-date" class="block text-sm font-medium text-gray-300 mb-1" data-key="booking_date">Date</label>
-                    <input type="date" id="booking-date" class="w-full bg-gray-700 border-gray-600 rounded-md p-2 text-white" required>
-                </div>
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label for="start-time" class="block text-sm font-medium text-gray-300 mb-1" data-key="booking_start_time">Start Time</label>
-                        <input type="time" id="start-time" class="w-full bg-gray-700 border-gray-600 rounded-md p-2 text-white" required>
-                    </div>
-                    <div>
-                        <label for="end-time" class="block text-sm font-medium text-gray-300 mb-1" data-key="booking_end_time">End Time</label>
-                        <input type="time" id="end-time" class="w-full bg-gray-700 border-gray-600 rounded-md p-2 text-white" required>
-                    </div>
-                </div>
-                <div class="mb-6">
-                    <label for="guests" class="block text-sm font-medium text-gray-300 mb-1" data-key="booking_guests">Number of Guests</label>
-                    <input type="number" id="guests" min="1" max="10" value="1" class="w-full bg-gray-700 border-gray-600 rounded-md p-2 text-white" required>
-                </div>
-                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-gray-900 font-bold py-3 rounded-lg transition" data-key="booking_confirm">Confirm Booking</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Signup Modal -->
-    <div id="signup-modal" class="modal hidden fixed inset-0 bg-gray-900 bg-opacity-75 z-50 flex items-center justify-center p-4 opacity-0">
-        <div class="bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6 relative">
-            <button class="modal-close-btn absolute top-4 right-4 text-gray-500 hover:text-white">
-                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-            <h3 class="text-2xl font-bold mb-4" data-key="signup_title">Join Féplace</h3>
-            <form id="signup-form">
-                <div class="mb-4">
-                    <label for="name" class="block text-sm font-medium text-gray-300 mb-1" data-key="signup_name">Full Name</label>
-                    <input type="text" id="name" class="w-full bg-gray-700 border-gray-600 rounded-md p-2 text-white" required>
-                </div>
-                <div class="mb-4">
-                    <label for="email" class="block text-sm font-medium text-gray-300 mb-1" data-key="signup_email">Email Address</label>
-                    <input type="email" id="email" class="w-full bg-gray-700 border-gray-600 rounded-md p-2 text-white" required>
-                </div>
-                <div class="mb-6">
-                    <label for="password" class="block text-sm font-medium text-gray-300 mb-1" data-key="signup_password">Password</label>
-                    <input type="password" id="password" class="w-full bg-gray-700 border-gray-600 rounded-md p-2 text-white" required>
-                </div>
-                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-gray-900 font-bold py-3 rounded-lg transition" data-key="signup_create">Create Account</button>
-            </form>
-            <p class="text-center text-sm text-gray-400 mt-4">
-                <span data-key="signup_already">Already have an account?</span>
-                <a href="#" class="text-amber-400 hover:underline" data-key="signup_login">Log in</a>
-            </p>
-        </div>
-    </div>
-    
-    <!-- Custom Alert Box -->
-    <div id="alert-box" class="hidden fixed top-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg z-50">
-        <p id="alert-message"></p>
-    </div>
-
+    <!-- ===========================
+         Inline JavaScript
+         - Particle background (canvas)
+         - Reveal interaction for step 4 (for demo only, non-destructive)
+         - Accessibility: keyboard activation for reveal
+         =========================== -->
     <script>
-        // --- TRANSLATION DATA ---
-        const translations = {
-            'en': {
-                'title': 'Féplace',
-                'nav_features': 'Features',
-                'nav_how': 'How It Works',
-                'nav_locations': 'Locations',
-                'nav_signup': 'Sign Up',
-                'hero_title': 'Unlock the Night: Your After-Hours Workspace',
-                'hero_subtitle': 'Turn quiet cafe nights into your next productive session. Find and book unique, inspiring spaces when you need them most.',
-                'hero_explore': 'Explore Cafes',
-                'hero_learn': 'Learn More',
-                'how_title': 'How It Works',
-                'how_subtitle': 'Productivity in three simple steps.',
-                'how_step1_title': '1. Find a Space',
-                'how_step1_desc': 'Browse our curated list of late-night cafes. Filter by location, amenities, and vibe.',
-                'how_step2_title': '2. Book Your Spot',
-                'how_step2_desc': 'Reserve your table or seat for the hours you need. Secure and simple online payment.',
-                'how_step3_title': '3. Work & Enjoy',
-                'how_step3_desc': 'Show up, connect to Wi-Fi, and get to work. Enjoy the unique ambiance of a cafe after dark.',
-                'featured_title': 'Featured Location',
-                'featured_address': 'No. 4, Jincheng 2nd Rd, East District, Hsinchu City, 300',
-                'featured_desc': 'A cozy and modern cafe known for its specialty coffee and welcoming atmosphere. Perfect for focused work or quiet contemplation after the sun goes down.',
-                'featured_hours': 'Night Owl Hours: 7:00 PM - 1:00 AM',
-                'featured_amenities': 'High-Speed Wi-Fi & Power Outlets',
-                'featured_book': 'Book a Spot',
-                'why_title': 'Why Choose Féplace?',
-                'feature1_title': 'Flexible Hours',
-                'feature1_desc': 'Work on your schedule. Our spaces are available when traditional co-working spots are closed.',
-                'feature2_title': 'Unique Ambiance',
-                'feature2_desc': 'Experience the focus and calm of a cafe at night. Less noise, more flow.',
-                'feature3_title': 'Curated Locations',
-                'feature3_desc': 'We partner with the best independent cafes, each with its own character and charm.',
-                'feature4_title': 'Community',
-                'feature4_desc': 'Connect with fellow night owls, freelancers, and creatives in a relaxed setting.',
-                'cta_title': 'Ready to Reclaim Your Nights?',
-                'cta_subtitle': 'Join the Féplace community and discover your new favorite workspace.',
-                'cta_button': 'Get Started Now',
-                'footer_copy': '© 2025 Féplace. All Rights Reserved.',
-                'footer_privacy': 'Privacy Policy',
-                'footer_terms': 'Terms of Service',
-                'footer_contact': 'Contact',
-                'booking_title': 'Book a Spot at Sunrise Cafe',
-                'booking_date': 'Date',
-                'booking_start_time': 'Start Time',
-                'booking_end_time': 'End Time',
-                'booking_guests': 'Number of Guests',
-                'booking_confirm': 'Confirm Booking',
-                'booking_success': 'Booking confirmed! A confirmation has been sent to your email.',
-                'signup_title': 'Join Féplace',
-                'signup_name': 'Full Name',
-                'signup_email': 'Email Address',
-                'signup_password': 'Password',
-                'signup_create': 'Create Account',
-                'signup_already': 'Already have an account?',
-                'signup_login': 'Log in',
-                'signup_success': 'Welcome! Your account has been created successfully.'
-            },
-            'zh-tw': {
-                'title': 'Féplace',
-                'nav_features': '特色',
-                'nav_how': '如何運作',
-                'nav_locations': '地點',
-                'nav_signup': '註冊',
-                'hero_title': '解鎖夜晚：您的午夜工作空間',
-                'hero_subtitle': '將寧靜的咖啡館夜晚變成您下一個高效的工作時光。尋找並預訂您最需要的獨特、啟發靈感的空間。',
-                'hero_explore': '探索咖啡館',
-                'hero_learn': '了解更多',
-                'how_title': '如何運作',
-                'how_subtitle': '三個簡單步驟，提升生產力。',
-                'how_step1_title': '1. 尋找空間',
-                'how_step1_desc': '瀏覽我們精選的深夜咖啡館列表。按地點、設施和氛圍進行篩選。',
-                'how_step2_title': '2. 預訂您的位置',
-                'how_step2_desc': '預訂您需要的時段的桌子或座位。安全便捷的線上支付。',
-                'how_step3_title': '3. 開始工作與享受',
-                'how_step3_desc': '到場後，連接Wi-Fi，即可開始工作。享受深夜咖啡館的獨特氛圍。',
-                'featured_title': '特色地點',
-                'featured_address': '300新竹市東區金城二路4號',
-                'featured_desc': '一家舒適現代的咖啡館，以其特色咖啡和熱情的氛圍而聞名。太陽下山後，這裡是專心工作或靜心思考的完美場所。',
-                'featured_hours': '夜貓時段：晚上 7:00 - 凌晨 1:00',
-                'featured_amenities': '高速 Wi-Fi 和電源插座',
-                'featured_book': '預訂座位',
-                'why_title': '為何選擇Féplace？',
-                'feature1_title': '彈性時間',
-                'feature1_desc': '按照您的時間表工作。當傳統共享辦公空間關閉時，我們的空間仍然可用。',
-                'feature2_title': '獨特氛圍',
-                'feature2_desc': '體驗夜晚咖啡館的專注與寧靜。更少噪音，更多流暢。',
-                'feature3_title': '精選地點',
-                'feature3_desc': '我們與最優質的獨立咖啡館合作，每一家都有自己的特色和魅力。',
-                'feature4_title': '社群',
-                'feature4_desc': '在輕鬆的環境中與其他夜貓子、自由工作者和創意人士建立聯繫。',
-                'cta_title': '準備好重拾您的夜晚了嗎？',
-                'cta_subtitle': '加入Féplace社群，發現您最愛的新工作空間。',
-                'cta_button': '立即開始',
-                'footer_copy': '© 2025 Féplace. 版權所有.',
-                'footer_privacy': '隱私政策',
-                'footer_terms': '服務條款',
-                'footer_contact': '聯絡我們',
-                'booking_title': '預訂 日出咖啡 的座位',
-                'booking_date': '日期',
-                'booking_start_time': '開始時間',
-                'booking_end_time': '結束時間',
-                'booking_guests': '人數',
-                'booking_confirm': '確認預訂',
-                'booking_success': '預訂成功！確認信已寄至您的電子信箱。',
-                'signup_title': '加入 Féplace',
-                'signup_name': '全名',
-                'signup_email': '電子郵件地址',
-                'signup_password': '密碼',
-                'signup_create': '建立帳戶',
-                'signup_already': '已經有帳戶了？',
-                'signup_login': '登入',
-                'signup_success': '歡迎！您的帳戶已成功建立。'
-            }
+      /*************************************************************
+       * Particles background
+       *
+       * Key customization:
+       *  - var(--particle-count) : number of particles
+       *  - var(--particle-speed-mult) : speed multiplier
+       *  - colors are derived from CSS variables to match theme
+       *
+       * This is plain JS and runs without external libraries.
+       *************************************************************/
+      (function(){
+        const canvas = document.getElementById('bgParticles');
+        const ctx = canvas.getContext('2d');
+        let DPR = Math.max(1, window.devicePixelRatio || 1);
+
+        // get CSS var helpers
+        const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
+        let settings = {
+          count: Math.max(10, parseInt(css('--particle-count')) || 60),
+          speedMult: parseFloat(css('--particle-speed-mult')) || 0.4,
+          colors: [
+            css('--accent-1') || '#ff7a9a',
+            css('--accent-2') || '#ffbe7a',
+            css('--accent-3') || '#7ad7ff'
+          ],
+          maxSize: 3.8,
+          minSize: 0.8,
+          drift: 0.2
         };
 
-        let currentLang = 'en';
-
-        // --- UTILITY FUNCTIONS ---
-        function setLanguage(lang) {
-            currentLang = lang;
-            document.documentElement.lang = lang;
-            document.querySelectorAll('[data-key]').forEach(element => {
-                const key = element.getAttribute('data-key');
-                if (translations[lang]?.[key]) {
-                    if(element.tagName === 'A' && element.querySelector('span')) {
-                        element.querySelector('span').textContent = translations[lang][key];
-                    } else {
-                        element.textContent = translations[lang][key];
-                    }
-                }
-            });
+        function resize(){
+          DPR = Math.max(1, window.devicePixelRatio || 1);
+          canvas.width = Math.ceil(window.innerWidth * DPR);
+          canvas.height = Math.ceil(window.innerHeight * DPR);
+          canvas.style.width = window.innerWidth + 'px';
+          canvas.style.height = window.innerHeight + 'px';
+          ctx.setTransform(DPR,0,0,DPR,0,0);
         }
-        
-        function showAlert(messageKey) {
-            const alertBox = document.getElementById('alert-box');
-            const alertMessage = document.getElementById('alert-message');
-            
-            alertMessage.textContent = translations[currentLang][messageKey] || messageKey;
-            alertBox.classList.remove('hidden');
-            
-            setTimeout(() => {
-                alertBox.classList.add('hidden');
-            }, 3000);
+        window.addEventListener('resize', resize, {passive:true});
+        resize();
+
+        // build particles
+        const particles = [];
+        function rand(min,max){ return Math.random()*(max-min)+min; }
+        for(let i=0;i<settings.count;i++){
+          particles.push({
+            x: rand(0, canvas.width / DPR),
+            y: rand(0, canvas.height / DPR),
+            vx: rand(-0.25,0.25) * settings.speedMult,
+            vy: rand(-0.15,0.15) * settings.speedMult,
+            size: rand(settings.minSize, settings.maxSize),
+            color: settings.colors[Math.floor(Math.random()*settings.colors.length)],
+            alpha: rand(0.08, 0.5)
+          });
         }
 
-        // --- MODAL LOGIC ---
-        function setupModals() {
-            const bookingModal = document.getElementById('booking-modal');
-            const signupModal = document.getElementById('signup-modal');
-            
-            const openModal = (modal) => {
-                modal.classList.remove('hidden');
-                setTimeout(() => modal.classList.add('opacity-100'), 10);
-            };
+        let last = performance.now();
+        function step(now){
+          const dt = Math.min(40, now - last) / 16.666; // normalized
+          last = now;
 
-            const closeModal = (modal) => {
-                modal.classList.remove('opacity-100');
-                setTimeout(() => modal.classList.add('hidden'), 300);
-            };
+          ctx.clearRect(0,0,canvas.width, canvas.height);
 
-            document.querySelectorAll('.booking-btn').forEach(btn => 
-                btn.addEventListener('click', () => openModal(bookingModal))
-            );
-            document.querySelectorAll('.signup-btn').forEach(btn => 
-                btn.addEventListener('click', () => openModal(signupModal))
-            );
+          for (const p of particles){
+            // simple movement with mild vertical drift
+            p.x += p.vx * dt * (1 + Math.sin(now/6000)*0.6);
+            p.y += p.vy * dt * (1 + Math.cos(now/5000)*0.4) + (p.size * 0.02);
 
-            document.querySelectorAll('.modal-close-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    closeModal(bookingModal);
-                    closeModal(signupModal);
-                });
-            });
+            // wrap-around edges
+            if (p.x < -20) p.x = canvas.width / DPR + 20;
+            if (p.x > canvas.width / DPR + 20) p.x = -20;
+            if (p.y < -20) p.y = canvas.height / DPR + 20;
+            if (p.y > canvas.height / DPR + 20) p.y = -20;
 
-            [bookingModal, signupModal].forEach(modal => {
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) {
-                        closeModal(modal);
-                    }
-                });
-            });
-
-            document.getElementById('booking-form').addEventListener('submit', (e) => {
-                e.preventDefault();
-                closeModal(bookingModal);
-                showAlert('booking_success');
-            });
-
-            document.getElementById('signup-form').addEventListener('submit', (e) => {
-                e.preventDefault();
-                closeModal(signupModal);
-                showAlert('signup_success');
-            });
+            // draw
+            ctx.beginPath();
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = p.alpha;
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+            ctx.fill();
+          }
+          ctx.globalAlpha = 1;
+          requestAnimationFrame(step);
         }
 
-
-        // --- SCROLL ANIMATION LOGIC ---
-        function setupScrollAnimation() {
-            const animatedElements = document.querySelectorAll('.scroll-animate');
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, {
-                threshold: 0.1 
-            });
-            animatedElements.forEach(el => observer.observe(el));
+        // reduce motion if user prefers
+        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (!reduced) requestAnimationFrame(step);
+        else {
+          // single subtle render if reduced motion
+          for (const p of particles){
+            ctx.beginPath();
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = p.alpha;
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+            ctx.fill();
+          }
+          ctx.globalAlpha = 1;
         }
-        
-        // --- MOBILE MENU LOGIC ---
-        function setupMobileMenu() {
-            const openBtn = document.getElementById('menu-open-btn');
-            const closeBtn = document.getElementById('menu-close-btn');
-            const menu = document.getElementById('mobile-menu');
-            const menuLinks = document.querySelectorAll('.mobile-menu-link');
+      })();
 
-            const openMenu = () => menu.classList.remove('hidden');
-            const closeMenu = () => menu.classList.add('hidden');
-            
-            openBtn.addEventListener('click', openMenu);
-            closeBtn.addEventListener('click', closeMenu);
-            menuLinks.forEach(link => {
-                if (!link.classList.contains('signup-btn')) {
-                    link.addEventListener('click', closeMenu);
-                }
-            });
-        }
-        
-        // --- SLIDER LOGIC ---
-        function setupSlider() {
-            const sliderWrapper = document.querySelector('.slider-wrapper');
-            const prevBtn = document.querySelector('.slider-prev');
-            const nextBtn = document.querySelector('.slider-next');
-            const slides = document.querySelectorAll('.slider-item');
-            let currentIndex = 0;
-            const totalSlides = slides.length;
+      /*************************************************************
+       * "Reveal the Connection" interactive demo
+       * - toggles a visual state on the 4th step
+       * - This is intentionally simple: in a real product, this
+       *   would be tied to backend state and user consent flows.
+       *
+       * Accessibility:
+       * - step is focusable and toggleable via Enter/Space.
+       *************************************************************/
+      (function(){
+        const revealStep = document.getElementById('revealStep');
+        const revealDot = document.getElementById('revealDot');
 
-            function goToSlide(index) {
-                sliderWrapper.style.transform = `translateX(-${index * 100}%)`;
-            }
-
-            prevBtn.addEventListener('click', () => {
-                currentIndex = (currentIndex > 0) ? currentIndex - 1 : totalSlides - 1;
-                goToSlide(currentIndex);
-            });
-
-            nextBtn.addEventListener('click', () => {
-                currentIndex = (currentIndex < totalSlides - 1) ? currentIndex + 1 : 0;
-                goToSlide(currentIndex);
-            });
+        let revealed = false;
+        function setRevealed(val){
+          revealed = !!val;
+          if(revealed){
+            revealStep.classList.add('revealed');
+            revealStep.setAttribute('aria-pressed', 'true');
+            revealDot.setAttribute('title','Connection revealed');
+          }else{
+            revealStep.classList.remove('revealed');
+            revealStep.setAttribute('aria-pressed', 'false');
+            revealDot.setAttribute('title','Reveal status');
+          }
         }
 
-        // --- INITIALIZATION ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const userLang = navigator.language || navigator.userLanguage;
-            const initialLang = userLang.startsWith('zh') ? 'zh-tw' : 'en';
-            setLanguage(initialLang); 
-
-            setupScrollAnimation();
-            setupMobileMenu();
-            setupModals();
-            setupSlider();
+        // simple toggle on click for demo purposes
+        revealStep.addEventListener('click', function(e){
+          setRevealed(!revealed);
         });
-    </script>
+        // keyboard activation
+        revealStep.addEventListener('keydown', function(e){
+          if (e.key === 'Enter' || e.key === ' '){
+            e.preventDefault();
+            setRevealed(!revealed);
+          }
+        });
 
+        // optional: show a small confetti-like pulse when revealed
+        function pulse(){
+          if (!revealed) return;
+          const el = document.createElement('span');
+          el.style.position = 'absolute';
+          el.style.pointerEvents = 'none';
+          el.style.width = '160px';
+          el.style.height = '160px';
+          el.style.left = 'calc(100% - 220px)';
+          el.style.top = '10px';
+          el.style.borderRadius = '50%';
+          el.style.background = 'radial-gradient(circle at 30% 30%, rgba(255,122,154,0.12), rgba(255,190,122,0.06))';
+          el.style.opacity = '0.9';
+          el.style.zIndex = '3';
+          el.style.transition = 'transform .9s ease-out, opacity .9s ease-out';
+          el.style.transform = 'scale(.6)';
+          document.body.appendChild(el);
+          requestAnimationFrame(()=> {
+            el.style.transform = 'scale(1.6)';
+            el.style.opacity = '0';
+          });
+          setTimeout(()=> el.remove(), 900);
+        }
+
+        // watch for reveal state changes (simple hook)
+        const observer = new MutationObserver(()=> {
+          if (revealStep.classList.contains('revealed')) pulse();
+        });
+        observer.observe(revealStep, { attributes:true, attributeFilter: ['class'] });
+
+        // initialize
+        setRevealed(false);
+      })();
+
+      /*************************************************************
+       * Minimal progressive enhancement for the "Join" button:
+       * - adds a small click ripple and protects against accidental clicks
+       *************************************************************/
+      (function(){
+        const btn = document.getElementById('joinBtn');
+        btn.addEventListener('click', function(e){
+          // quick visual feedback: tiny scale
+          btn.style.transition = 'transform .12s ease';
+          btn.style.transform = 'scale(.985)';
+          setTimeout(()=> btn.style.transform = '', 120);
+          // here we do not prevent navigation; link opens in new tab
+        });
+      })();
+
+      /*************************************************************
+       * NOTES / TIPS (in-code comments for future customization)
+       * - To change the Google Form link, edit the href of #joinBtn.
+       * - Adjust color theme via CSS variables at top (accent colors, bg).
+       * - To reduce particles for mobile, lower --particle-count.
+       * - To completely disable animation for performance, remove the canvas element.
+       *************************************************************/
+    </script>
+  </main>
 </body>
 </html>
+
